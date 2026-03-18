@@ -2,8 +2,6 @@
 
 > Iron & Crown — A Grand Strategy Game
 
-纯HTML单文件策略游戏，灵感来自维多利亚3、骑马与砍杀2、文明时代3、钢铁雄心4。
-
 ## 在线游玩
 
 部署到 GitHub Pages 后，直接访问 `https://<username>.github.io/<repo>/` 即可。
@@ -56,29 +54,3 @@ python build.py -o ./index.html
 ```
 
 构建后打开 `dist/index.html` 即可游玩。
-
-## GitHub Pages 部署
-
-本项目配置了 GitHub Actions，推送到 `main` 分支后会自动：
-1. 运行 `build.py` 生成 `dist/index.html`
-2. 部署到 GitHub Pages
-
-### 手动设置步骤：
-1. 仓库 Settings → Pages → Source 选择 **GitHub Actions**
-2. 推送代码，等待 Action 完成
-3. 访问 `https://<username>.github.io/<repo>/`
-
-## 已完成功能
-
-- 剧本编辑器：地图放城池/海权点/航海线/匪寇
-- 工具栏切换（选择/城池/海权点/航海线/匪寇/删除）
-- 右侧面板CRUD：势力、城池、航线、匪寇、人物、文化、兵种、设置
-- 地图缩放拖动、小地图、保存剧本到localStorage
-
-## 技术要求
-
-- 纯HTML单文件，所有JS内联
-- 不使用ES6模板字符串
-- HTML转义用createElement方式
-- IIFE包裹所有代码
-- 暖白UI风格（米白+浅棕+金色点缀）
