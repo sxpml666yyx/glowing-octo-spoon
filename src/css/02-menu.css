@@ -1,0 +1,10 @@
+/* ===== menu.css — 主菜单 ===== */
+#menu{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#f8f2e6,#ede4d0 50%,#e2d8c0)}
+.m-title{font-family:'GB',cursive;font-size:clamp(2.8rem,6vw,4.5rem);color:var(--bd3);text-shadow:0 2px 8px rgba(100,80,40,.15);letter-spacing:.15em;margin-bottom:.1em}
+.m-sub{font-size:clamp(.75rem,1.2vw,.95rem);color:var(--tx3);letter-spacing:.4em;margin-bottom:2.5rem}
+.m-btns{display:flex;flex-direction:column;gap:.5rem;width:clamp(280px,30vw,400px)}
+.m-btn{background:var(--card);border:1px solid var(--bd);color:var(--tx);padding:.85rem 1.3rem;font-size:.95rem;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:.8rem;border-radius:6px;box-shadow:var(--shadow)}
+.m-btn:hover{background:var(--card2);border-color:var(--bd2);transform:translateY(-1px);box-shadow:var(--shadow2)}
+.m-btn i{font-size:1.2rem;width:1.6rem;text-align:center;font-style:normal;opacity:.7}
+.m-btn em{flex:1;font-style:normal;font-weight:600}
+.m-btn small{display:block;font-size:.72rem;color:var(--tx3);font-weight:400;margin-top:2px}

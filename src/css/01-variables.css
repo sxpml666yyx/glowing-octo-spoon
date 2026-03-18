@@ -1,0 +1,20 @@
+/* ===== variables.css — 全局变量与重置 ===== */
+@font-face{font-family:'GS';src:local('Noto Serif SC'),local('Microsoft YaHei'),local('SimSun'),serif}
+@font-face{font-family:'GB';src:local('Ma Shan Zheng'),local('STXingkai'),local('华文行楷'),local('KaiTi'),cursive}
+:root{
+  --bg:#f5f0e8;--bg2:#ebe4d6;--bg3:#e0d6c2;--bg4:#d4c9b0;
+  --card:#faf7f0;--card2:#f0ebe0;
+  --bd:#c8b99a;--bd2:#a89878;--bd3:#8a7a5a;
+  --tx:#3a3028;--tx2:#5a5040;--tx3:#8a7a68;
+  --gold:#b8963a;--gold2:#d4aa44;--goldBg:rgba(184,150,58,.12);
+  --red:#c05040;--redBg:rgba(192,80,64,.1);
+  --green:#508050;--greenBg:rgba(80,128,80,.1);
+  --blue:#4070a0;--blueBg:rgba(64,112,160,.1);
+  --shadow:0 2px 12px rgba(60,40,20,.12);
+  --shadow2:0 4px 20px rgba(60,40,20,.18);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:'GS',serif;font-size:15px}
+::-webkit-scrollbar{width:7px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--bd2)}
+input,textarea,select,button{font-family:'GS',serif}

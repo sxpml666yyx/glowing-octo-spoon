@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>铁与王冠 — 万世征途</title>
+<style>
+/* === STYLES_PLACEHOLDER === */
+</style>
+</head>
+<body>
+
+<!-- MENU -->
+<div id="menu">
+<div class="m-title">铁与王冠</div>
+<div class="m-sub">万 世 征 途</div>
+<div class="m-btns" id="menuBtns"></div>
+</div>
+
+<!-- MODAL -->
+<div id="ov" class="ov"><div class="mo" id="moc"><div class="mo-h"><h2 id="mot"></h2><button class="xb" id="moX">✕</button></div><div class="mo-b" id="mob"></div><div class="mo-f" id="mof"></div></div></div>
+
+<!-- SCENARIO EDITOR -->
+<div id="editor">
+<div class="ed-top">
+  <button class="b bs bsm" id="edBack">← 返回</button>
+  <h2 id="edTitle">剧本编辑器</h2>
+  <button class="b bs bsm" id="edSave">💾 保存剧本</button>
+  <button class="b bp bsm" id="edPlay">▶ 测试运行</button>
+</div>
+<div class="ed-main">
+  <div class="ed-map" id="edMap">
+    <div id="edCanvas">
+      <img id="edImg" draggable="false">
+    </div>
+    <div class="ed-toolbar" id="edToolbar"></div>
+    <div class="ed-mini" id="edMini"><img id="edMiniImg" draggable="false"><div class="ed-mini-vp" id="edMiniVp"></div></div>
+    <div class="ed-status" id="edStatus">就绪</div>
+    <div class="nf" id="nf"></div>
+  </div>
+  <div class="ed-side">
+    <div class="ed-side-tabs" id="edSideTabs"></div>
+    <div class="ed-side-body" id="edSideBody"></div>
+  </div>
+</div>
+</div>
+
+<!-- GAME -->
+<div id="game">
+  <!-- HUD Top Bar -->
+  <div class="g-hud">
+    <div class="g-hud-faction"><span class="fc" id="gFacColor"></span><span id="gFacName">—</span></div>
+    <div class="g-hud-stat"><span>💰</span><b id="gGold">0</b>(<span id="gIncome" class="pos">+0</span>)</div>
+    <div class="g-hud-stat"><span>👥</span><b id="gPop">0</b></div>
+    <div class="g-hud-stat"><span>⚔</span><b id="gArmy">0</b></div>
+    <div class="g-hud-stat"><span>🔬</span><b id="gTech">0</b></div>
+    <div class="g-hud-space"></div>
+    <div class="g-time">
+      <button class="g-speed" id="gPause" title="暂停(空格)">⏸</button>
+      <button class="g-speed" id="gSpeed1" title="1x">1</button>
+      <button class="g-speed" id="gSpeed2" title="2x">2</button>
+      <button class="g-speed" id="gSpeed3" title="3x">3</button>
+      <div class="g-time-date" id="gDate">1年1月1日</div>
+    </div>
+    <button class="b bs bsm" id="gMenuBtn">☰ 菜单</button>
+  </div>
+  <!-- Game Map -->
+  <div class="g-map" id="gMap">
+    <div id="gCanvas">
+      <img id="gImg" draggable="false">
+    </div>
+    <div class="g-mini" id="gMini"><img id="gMiniImg" draggable="false"><div class="g-mini-vp" id="gMiniVp"></div></div>
+    <div class="g-nf" id="gNf"></div>
+    <div class="g-actions" id="gActions">
+      <button class="g-act" id="gBtnTech">🔬 科技</button>
+      <button class="g-act" id="gBtnLaw">📜 法律</button>
+      <button class="g-act" id="gBtnDiplo">🤝 外交</button>
+    </div>
+    <!-- Side panels -->
+    <div class="g-panel" id="gPanelTech"><div class="g-panel-h"><h3>科技研究</h3><button class="xb" id="gCloseTech">✕</button></div><div class="g-panel-b" id="gTechBody"></div></div>
+    <div class="g-panel" id="gPanelLaw"><div class="g-panel-h"><h3>法律制度</h3><button class="xb" id="gCloseLaw">✕</button></div><div class="g-panel-b" id="gLawBody"></div></div>
+    <div class="g-panel" id="gPanelDiplo"><div class="g-panel-h"><h3>外交关系</h3><button class="xb" id="gCloseDiplo">✕</button></div><div class="g-panel-b" id="gDiploBody"></div></div>
+  </div>
+</div>
+</body>
+
+<script>
+/* === JS_PLACEHOLDER === */
+</script>
+</html>

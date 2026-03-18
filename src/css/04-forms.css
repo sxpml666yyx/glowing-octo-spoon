@@ -1,0 +1,16 @@
+/* ===== forms.css — 表单与按钮 ===== */
+.fr{margin-bottom:.85rem}
+.fl{display:block;font-size:.8rem;color:var(--tx2);margin-bottom:.3rem;font-weight:600}
+.fi,.fsel,.ft{width:100%;background:#fff;border:1.5px solid var(--bd);color:var(--tx);padding:.55rem .75rem;font-size:.9rem;border-radius:5px;transition:border-color .2s;outline:none}
+.fi:focus,.fsel:focus,.ft:focus{border-color:var(--gold)}
+.ft{min-height:70px;resize:vertical}
+.frr{display:flex;gap:.75rem;flex-wrap:wrap}.frr .fr{flex:1;min-width:100px;margin-bottom:0}
+
+/* Buttons */
+.b{padding:.5rem 1.1rem;font-size:.85rem;border:1.5px solid var(--bd);cursor:pointer;transition:all .15s;border-radius:5px;font-weight:600}
+.bp{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;border-color:var(--gold);text-shadow:0 1px 2px rgba(0,0,0,.15)}
+.bp:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.bs{background:var(--card);color:var(--tx)}.bs:hover{background:var(--bg2);border-color:var(--bd2)}
+.bd{background:var(--redBg);color:var(--red);border-color:var(--red)}.bd:hover{background:rgba(192,80,64,.2)}
+.bsm{padding:.35rem .7rem;font-size:.78rem}
+.bxs{padding:.25rem .5rem;font-size:.72rem}

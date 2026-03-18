@@ -1,0 +1,26 @@
+/* ===== editor.css — 编辑器布局 ===== */
+#editor{position:fixed;inset:0;display:none;background:var(--bg)}
+#editor.on{display:flex;flex-direction:column}
+.ed-top{height:48px;background:var(--card);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 1rem;gap:1rem;flex-shrink:0;box-shadow:0 1px 4px rgba(60,40,20,.08)}
+.ed-top h2{font-size:1rem;font-weight:700;color:var(--bd3);flex:1}
+.ed-main{flex:1;display:flex;overflow:hidden}
+
+/* Map area */
+.ed-map{flex:1;position:relative;overflow:hidden;cursor:crosshair;background:#cde0f0}
+.ed-map.dragging{cursor:grab}
+#edCanvas{position:absolute;transform-origin:0 0}
+#edImg{display:block;-webkit-user-drag:none;user-select:none}
+
+/* Sidebar */
+.ed-side{width:340px;background:var(--card);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.ed-side-tabs{display:flex;border-bottom:1px solid var(--bd);background:var(--bg2);flex-shrink:0}
+.ed-side-tab{flex:1;padding:.6rem;text-align:center;font-size:.82rem;font-weight:600;color:var(--tx3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .15s}
+.ed-side-tab:hover{color:var(--tx2)}.ed-side-tab.on{color:var(--gold);border-bottom-color:var(--gold);background:var(--card)}
+.ed-side-body{flex:1;overflow-y:auto;padding:.8rem}
+
+/* Toolbar floating on map */
+.ed-toolbar{position:absolute;top:.8rem;left:50%;transform:translateX(-50%);display:flex;gap:.4rem;background:var(--card);padding:.4rem .6rem;border:1px solid var(--bd);border-radius:8px;box-shadow:var(--shadow);z-index:10}
+.ed-tool{width:42px;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg2);border:1.5px solid var(--bd);border-radius:6px;cursor:pointer;font-size:.65rem;color:var(--tx3);transition:all .15s;gap:1px}
+.ed-tool span{font-size:1rem}
+.ed-tool:hover{background:var(--bg3);border-color:var(--bd2);color:var(--tx)}
+.ed-tool.on{background:var(--goldBg);border-color:var(--gold);color:var(--gold)}
