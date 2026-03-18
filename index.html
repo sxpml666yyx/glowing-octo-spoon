@@ -2,3032 +2,159 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>铁与王冠 — 万世征途</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&display=swap');
-
-:root {
-  --bg-primary: #0a0e17;
-  --bg-secondary: #111827;
-  --bg-panel: #1a2235;
-  --bg-card: #1e293b;
-  --bg-hover: #263044;
-  --border: #2d3a4f;
-  --border-active: #4a7c9b;
-  --text-primary: #e8e0d4;
-  --text-secondary: #9ca3af;
-  --text-dim: #6b7280;
-  --accent-gold: #c9a84c;
-  --accent-red: #b44040;
-  --accent-blue: #3b82a0;
-  --accent-green: #4a8c5c;
-  --accent-purple: #7c5cbf;
-  --accent-orange: #c47830;
-  --shadow: 0 4px 24px rgba(0,0,0,0.5);
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-primary); color:var(--text-primary); font-family:'Noto Serif SC',serif; }
-
-/* Scrollbar */
-::-webkit-scrollbar { width:6px; }
-::-webkit-scrollbar-track { background:var(--bg-secondary); }
-::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
-::-webkit-scrollbar-thumb:hover { background:var(--border-active); }
-
-/* ===== MAIN MENU ===== */
-#mainMenu {
-  position:fixed; inset:0; z-index:9999;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  background: linear-gradient(180deg, #060a12 0%, #0d1520 40%, #15202e 100%);
-  overflow:hidden;
-}
-#mainMenu::before {
-  content:''; position:absolute; inset:0;
-  background: radial-gradient(ellipse 80% 50% at 50% 30%, rgba(201,168,76,0.06) 0%, transparent 70%);
-  pointer-events:none;
-}
-.menu-title {
-  font-family:'Ma Shan Zheng',cursive;
-  font-size:clamp(2.5rem,6vw,5rem);
-  color:var(--accent-gold);
-  text-shadow: 0 0 40px rgba(201,168,76,0.3), 0 4px 12px rgba(0,0,0,0.8);
-  letter-spacing:0.15em;
-  margin-bottom:0.2em;
-  position:relative; z-index:1;
-}
-.menu-subtitle {
-  font-size:clamp(0.8rem,1.5vw,1.1rem);
-  color:var(--text-dim);
-  letter-spacing:0.4em;
-  margin-bottom:3rem;
-  position:relative; z-index:1;
-}
-.menu-buttons {
-  display:flex; flex-direction:column; gap:0.7rem;
-  position:relative; z-index:1; width:clamp(240px,30vw,360px);
-}
-.menu-btn {
-  background: linear-gradient(135deg, rgba(26,34,53,0.9), rgba(30,41,59,0.9));
-  border:1px solid var(--border);
-  color:var(--text-primary);
-  padding:0.9rem 1.5rem;
-  font-family:'Noto Serif SC',serif;
-  font-size:clamp(0.85rem,1.2vw,1rem);
-  cursor:pointer;
-  transition:all 0.3s;
-  letter-spacing:0.1em;
-  text-align:left;
-  position:relative;
-  overflow:hidden;
-}
-.menu-btn::before {
-  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
-  background:var(--accent-gold); transform:scaleY(0); transition:transform 0.3s;
-}
-.menu-btn:hover {
-  background: linear-gradient(135deg, rgba(38,48,68,0.95), rgba(42,55,75,0.95));
-  border-color:var(--border-active);
-  transform:translateX(4px);
-}
-.menu-btn:hover::before { transform:scaleY(1); }
-.menu-btn .btn-icon { margin-right:0.8rem; opacity:0.6; }
-.menu-btn-sub { font-size:0.7rem; color:var(--text-dim); display:block; margin-top:2px; }
-
-/* Version tag */
-.version-tag {
-  position:absolute; bottom:1.5rem; right:2rem;
-  font-size:0.7rem; color:var(--text-dim); letter-spacing:0.2em;
-}
-
-/* ===== MODAL / EDITOR SYSTEM ===== */
-.modal-overlay {
-  position:fixed; inset:0; z-index:10000;
-  background:rgba(0,0,0,0.75); backdrop-filter:blur(4px);
-  display:flex; align-items:center; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity 0.3s;
-}
-.modal-overlay.active { opacity:1; pointer-events:auto; }
-.modal {
-  background:var(--bg-panel);
-  border:1px solid var(--border);
-  border-radius:4px;
-  width:clamp(400px,70vw,900px);
-  max-height:85vh;
-  display:flex; flex-direction:column;
-  box-shadow:var(--shadow);
-}
-.modal-wide { width:clamp(500px,85vw,1200px); }
-.modal-header {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:1rem 1.5rem;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.modal-header h2 {
-  font-size:1.1rem; font-weight:700;
-  color:var(--accent-gold); letter-spacing:0.08em;
-}
-.modal-close {
-  background:none; border:none; color:var(--text-dim);
-  font-size:1.3rem; cursor:pointer; padding:0.2rem 0.5rem;
-  transition:color 0.2s;
-}
-.modal-close:hover { color:var(--accent-red); }
-.modal-body {
-  padding:1.5rem;
-  overflow-y:auto;
-  flex:1;
-}
-.modal-footer {
-  padding:1rem 1.5rem;
-  border-top:1px solid var(--border);
-  display:flex; gap:0.5rem; justify-content:flex-end;
-  flex-shrink:0;
-}
-
-/* ===== FORM ELEMENTS ===== */
-.form-row { margin-bottom:1rem; }
-.form-label {
-  display:block; font-size:0.8rem; color:var(--text-secondary);
-  margin-bottom:0.4rem; letter-spacing:0.05em;
-}
-.form-input, .form-select, .form-textarea {
-  width:100%;
-  background:var(--bg-secondary);
-  border:1px solid var(--border);
-  color:var(--text-primary);
-  padding:0.6rem 0.8rem;
-  font-family:'Noto Serif SC',serif;
-  font-size:0.85rem;
-  border-radius:2px;
-  transition:border-color 0.2s;
-}
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-  outline:none; border-color:var(--accent-gold);
-}
-.form-textarea { min-height:80px; resize:vertical; }
-.form-input-sm { width:120px; display:inline-block; }
-.form-row-inline { display:flex; gap:1rem; flex-wrap:wrap; }
-.form-row-inline .form-row { flex:1; min-width:120px; margin-bottom:0; }
-
-/* Buttons */
-.btn {
-  padding:0.5rem 1.2rem;
-  font-family:'Noto Serif SC',serif;
-  font-size:0.8rem;
-  border:1px solid var(--border);
-  cursor:pointer;
-  transition:all 0.2s;
-  letter-spacing:0.05em;
-  border-radius:2px;
-}
-.btn-primary {
-  background:linear-gradient(135deg,var(--accent-gold),#a88a3a);
-  color:#0a0e17; border-color:var(--accent-gold); font-weight:700;
-}
-.btn-primary:hover { filter:brightness(1.15); }
-.btn-secondary {
-  background:var(--bg-card); color:var(--text-primary);
-}
-.btn-secondary:hover { background:var(--bg-hover); border-color:var(--border-active); }
-.btn-danger {
-  background:rgba(180,64,64,0.15); color:var(--accent-red); border-color:var(--accent-red);
-}
-.btn-danger:hover { background:rgba(180,64,64,0.3); }
-.btn-sm { padding:0.3rem 0.7rem; font-size:0.75rem; }
-.btn-icon-only { padding:0.3rem 0.5rem; line-height:1; }
-
-/* Tags / Chips */
-.tag {
-  display:inline-block; padding:0.15rem 0.5rem;
-  font-size:0.7rem; border-radius:2px;
-  background:var(--bg-hover); border:1px solid var(--border);
-  color:var(--text-secondary);
-}
-.tag-gold { border-color:var(--accent-gold); color:var(--accent-gold); }
-
-/* Searchbar */
-.search-bar {
-  display:flex; gap:0.5rem; margin-bottom:1rem;
-}
-.search-bar .form-input { flex:1; }
-
-/* List items */
-.list-item {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0.7rem 1rem;
-  background:var(--bg-card);
-  border:1px solid var(--border);
-  margin-bottom:0.4rem;
-  transition:all 0.2s;
-  border-radius:2px;
-}
-.list-item:hover { border-color:var(--border-active); background:var(--bg-hover); }
-.list-item-info { flex:1; }
-.list-item-name { font-size:0.9rem; font-weight:700; }
-.list-item-desc { font-size:0.75rem; color:var(--text-dim); margin-top:2px; }
-.list-item-actions { display:flex; gap:0.3rem; }
-
-/* Tabs */
-.tabs {
-  display:flex; border-bottom:1px solid var(--border); margin-bottom:1rem;
-}
-.tab {
-  padding:0.6rem 1.2rem;
-  font-size:0.8rem;
-  color:var(--text-dim);
-  cursor:pointer;
-  border-bottom:2px solid transparent;
-  transition:all 0.2s;
-  background:none; border-top:none; border-left:none; border-right:none;
-  font-family:'Noto Serif SC',serif;
-}
-.tab:hover { color:var(--text-secondary); }
-.tab.active { color:var(--accent-gold); border-bottom-color:var(--accent-gold); }
-
-/* Grid layouts */
-.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem; }
-.grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:0.6rem; }
-
-/* ===== GAME UI ===== */
-#gameUI {
-  position:fixed; inset:0; display:none;
-  background:var(--bg-primary);
-}
-#gameUI.active { display:block; }
-
-/* Top Bar */
-.game-topbar {
-  position:absolute; top:0; left:0; right:0; height:48px;
-  background:linear-gradient(180deg, rgba(10,14,23,0.95), rgba(10,14,23,0.8));
-  border-bottom:1px solid var(--border);
-  display:flex; align-items:center; padding:0 1rem;
-  z-index:100; backdrop-filter:blur(8px);
-}
-.topbar-section { display:flex; align-items:center; gap:0.8rem; }
-.topbar-left { flex:1; }
-.topbar-center { flex:2; justify-content:center; }
-.topbar-right { flex:1; justify-content:flex-end; }
-.topbar-stat {
-  display:flex; align-items:center; gap:0.3rem;
-  font-size:0.78rem; color:var(--text-secondary);
-  padding:0.2rem 0.6rem;
-  background:rgba(255,255,255,0.03);
-  border-radius:2px;
-}
-.topbar-stat .val { color:var(--accent-gold); font-weight:700; }
-.topbar-faction {
-  font-family:'Ma Shan Zheng',cursive;
-  font-size:1.2rem; color:var(--accent-gold);
-  letter-spacing:0.1em;
-}
-.time-display {
-  font-size:0.8rem; color:var(--text-primary);
-  font-variant-numeric:tabular-nums;
-}
-.speed-controls { display:flex; gap:2px; }
-.speed-btn {
-  background:var(--bg-card); border:1px solid var(--border);
-  color:var(--text-dim); padding:0.15rem 0.5rem;
-  font-size:0.7rem; cursor:pointer; transition:all 0.15s;
-  font-family:monospace;
-}
-.speed-btn:hover, .speed-btn.active {
-  color:var(--accent-gold); border-color:var(--accent-gold);
-}
-
-/* Map Container */
-#mapContainer {
-  position:absolute; top:48px; left:0; right:0; bottom:0;
-  overflow:hidden; cursor:grab;
-  background:#0d1926;
-}
-#mapContainer.dragging { cursor:grabbing; }
-#mapCanvas {
-  position:absolute;
-  transform-origin:0 0;
-}
-#mapImage {
-  display:block;
-  image-rendering:auto;
-  user-select:none;
-  -webkit-user-drag:none;
-}
-
-/* City markers on map */
-.city-marker {
-  position:absolute;
-  transform:translate(-50%,-50%);
-  cursor:pointer;
-  z-index:10;
-  transition:transform 0.15s;
-}
-.city-marker:hover { transform:translate(-50%,-50%) scale(1.15); z-index:20; }
-.city-dot {
-  width:14px; height:14px;
-  border-radius:50%;
-  border:2px solid var(--accent-gold);
-  background:var(--bg-primary);
-  box-shadow:0 0 8px rgba(201,168,76,0.4);
-  position:relative;
-}
-.city-dot.capital {
-  width:20px; height:20px;
-  border-width:3px;
-  background:var(--accent-gold);
-}
-.city-label {
-  position:absolute; top:100%; left:50%; transform:translateX(-50%);
-  white-space:nowrap;
-  font-size:0.65rem; color:var(--text-primary);
-  text-shadow:0 1px 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.7);
-  margin-top:3px; pointer-events:none;
-  font-weight:700;
-}
-
-/* Army markers */
-.army-marker {
-  position:absolute;
-  transform:translate(-50%,-50%);
-  cursor:pointer; z-index:15;
-  transition:left 0.5s linear, top 0.5s linear;
-}
-.army-icon {
-  width:24px; height:24px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:0.7rem;
-  border-radius:3px;
-  border:1px solid;
-  box-shadow:0 2px 6px rgba(0,0,0,0.5);
-  font-weight:700;
-}
-.army-count {
-  position:absolute; top:-6px; right:-8px;
-  font-size:0.55rem;
-  background:var(--accent-red);
-  color:#fff;
-  padding:0 3px;
-  border-radius:8px;
-  min-width:14px;
-  text-align:center;
-  font-weight:700;
-}
-
-/* Bandit markers */
-.bandit-marker {
-  position:absolute;
-  transform:translate(-50%,-50%);
-  cursor:pointer; z-index:12;
-}
-.bandit-icon {
-  width:18px; height:18px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:0.65rem;
-  background:rgba(80,30,30,0.8);
-  border:1px solid #8b4040;
-  border-radius:50%;
-  box-shadow:0 0 6px rgba(139,64,64,0.4);
-}
-
-/* Side Panel */
-.side-panel {
-  position:absolute; top:48px; right:0; bottom:0;
-  width:320px; max-width:40vw;
-  background:var(--bg-panel);
-  border-left:1px solid var(--border);
-  z-index:50;
-  display:flex; flex-direction:column;
-  transform:translateX(100%);
-  transition:transform 0.3s;
-}
-.side-panel.open { transform:translateX(0); }
-.panel-header {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0.8rem 1rem;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.panel-header h3 { font-size:0.95rem; color:var(--accent-gold); }
-.panel-body { flex:1; overflow-y:auto; padding:1rem; }
-.panel-section { margin-bottom:1.2rem; }
-.panel-section-title {
-  font-size:0.75rem; color:var(--text-dim);
-  text-transform:uppercase; letter-spacing:0.1em;
-  margin-bottom:0.5rem;
-  padding-bottom:0.3rem;
-  border-bottom:1px solid rgba(255,255,255,0.05);
-}
-.stat-row {
-  display:flex; justify-content:space-between;
-  padding:0.3rem 0;
-  font-size:0.8rem;
-}
-.stat-row .label { color:var(--text-secondary); }
-.stat-row .value { color:var(--text-primary); font-weight:700; }
-
-/* Bottom toolbar */
-.game-bottombar {
-  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
-  display:flex; gap:0.4rem;
-  z-index:100;
-  background:rgba(10,14,23,0.85);
-  padding:0.4rem;
-  border:1px solid var(--border);
-  border-radius:4px;
-  backdrop-filter:blur(8px);
-}
-.toolbar-btn {
-  width:40px; height:40px;
-  display:flex; align-items:center; justify-content:center;
-  background:var(--bg-card);
-  border:1px solid var(--border);
-  color:var(--text-secondary);
-  font-size:0.9rem;
-  cursor:pointer;
-  transition:all 0.15s;
-  border-radius:2px;
-  position:relative;
-}
-.toolbar-btn:hover { color:var(--accent-gold); border-color:var(--border-active); }
-.toolbar-btn.active { color:var(--accent-gold); border-color:var(--accent-gold); background:rgba(201,168,76,0.1); }
-.toolbar-btn .tooltip {
-  position:absolute; bottom:110%; left:50%; transform:translateX(-50%);
-  background:var(--bg-primary); border:1px solid var(--border);
-  padding:0.2rem 0.5rem; font-size:0.65rem;
-  white-space:nowrap; pointer-events:none;
-  opacity:0; transition:opacity 0.15s;
-  color:var(--text-secondary);
-}
-.toolbar-btn:hover .tooltip { opacity:1; }
-
-/* Minimap */
-.minimap {
-  position:absolute; bottom:1rem; left:1rem;
-  width:180px; height:110px;
-  background:var(--bg-card);
-  border:1px solid var(--border);
-  z-index:100;
-  overflow:hidden;
-  border-radius:2px;
-}
-.minimap img { width:100%; height:100%; object-fit:cover; opacity:0.7; }
-.minimap-viewport {
-  position:absolute;
-  border:1px solid var(--accent-gold);
-  background:rgba(201,168,76,0.1);
-  pointer-events:none;
-}
-
-/* Notification area */
-.notifications {
-  position:absolute; top:56px; right:8px;
-  z-index:200; width:280px;
-  display:flex; flex-direction:column; gap:0.3rem;
-}
-.notification {
-  background:var(--bg-panel);
-  border:1px solid var(--border);
-  border-left:3px solid var(--accent-gold);
-  padding:0.6rem 0.8rem;
-  font-size:0.75rem;
-  animation:slideIn 0.3s ease-out, fadeOut 0.5s 4s forwards;
-  border-radius:2px;
-}
-.notification.war { border-left-color:var(--accent-red); }
-.notification.peace { border-left-color:var(--accent-green); }
-@keyframes slideIn { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
-@keyframes fadeOut { to { opacity:0; transform:translateY(-10px); } }
-
-/* ===== TECH TREE VISUAL ===== */
-.tech-tree-container {
-  width:100%; overflow:auto;
-  background:var(--bg-secondary);
-  border:1px solid var(--border);
-  border-radius:2px;
-  padding:1rem;
-  min-height:300px;
-  position:relative;
-}
-.tech-era {
-  margin-bottom:1.5rem;
-}
-.tech-era-label {
-  font-size:0.75rem; color:var(--accent-gold);
-  letter-spacing:0.15em; margin-bottom:0.6rem;
-  text-transform:uppercase;
-  padding-bottom:0.3rem;
-  border-bottom:1px solid rgba(201,168,76,0.2);
-}
-.tech-nodes { display:flex; flex-wrap:wrap; gap:0.5rem; }
-.tech-node {
-  background:var(--bg-card);
-  border:1px solid var(--border);
-  padding:0.5rem 0.8rem;
-  font-size:0.75rem;
-  cursor:pointer;
-  transition:all 0.2s;
-  border-radius:2px;
-  min-width:100px;
-  position:relative;
-}
-.tech-node:hover { border-color:var(--border-active); }
-.tech-node.researched { border-color:var(--accent-green); background:rgba(74,140,92,0.1); }
-.tech-node.researching { border-color:var(--accent-blue); background:rgba(59,130,160,0.1); }
-.tech-node.locked { opacity:0.5; }
-.tech-node-name { font-weight:700; }
-.tech-node-cost { font-size:0.65rem; color:var(--text-dim); }
-.tech-progress {
-  position:absolute; bottom:0; left:0; height:2px;
-  background:var(--accent-blue);
-  transition:width 0.3s;
-}
-
-/* ===== FLAG EDITOR ===== */
-.flag-preview {
-  width:80px; height:54px;
-  border:1px solid var(--border);
-  display:flex; overflow:hidden;
-}
-.flag-stripe { flex:1; }
-.flag-editor-colors {
-  display:flex; gap:0.3rem; flex-wrap:wrap; margin-top:0.5rem;
-}
-.flag-color-btn {
-  width:24px; height:24px;
-  border:2px solid transparent;
-  cursor:pointer;
-  border-radius:2px;
-  transition:border-color 0.15s;
-}
-.flag-color-btn:hover, .flag-color-btn.active { border-color:#fff; }
-
-/* ===== DRAG & DROP HIERARCHY ===== */
-.hierarchy-tree {
-  padding:0.5rem;
-  min-height:100px;
-}
-.hierarchy-node {
-  background:var(--bg-card);
-  border:1px solid var(--border);
-  padding:0.5rem 0.8rem;
-  margin:0.3rem 0;
-  cursor:grab;
-  font-size:0.8rem;
-  display:flex; align-items:center; gap:0.5rem;
-  border-radius:2px;
-  transition:all 0.15s;
-}
-.hierarchy-node:active { cursor:grabbing; }
-.hierarchy-node.dragging { opacity:0.5; border-style:dashed; }
-.hierarchy-node.drag-over { border-color:var(--accent-gold); background:rgba(201,168,76,0.05); }
-.hierarchy-children {
-  margin-left:1.5rem;
-  border-left:1px dashed var(--border);
-  padding-left:0.5rem;
-}
-.hierarchy-handle { color:var(--text-dim); cursor:grab; }
-
-/* Context Menu */
-.context-menu {
-  position:fixed; z-index:10001;
-  background:var(--bg-panel); border:1px solid var(--border);
-  min-width:160px; box-shadow:var(--shadow);
-  display:none; border-radius:2px;
-}
-.context-menu.visible { display:block; }
-.context-menu-item {
-  padding:0.5rem 1rem;
-  font-size:0.8rem;
-  cursor:pointer;
-  transition:background 0.1s;
-  display:flex; align-items:center; gap:0.5rem;
-}
-.context-menu-item:hover { background:var(--bg-hover); }
-.context-menu-sep { height:1px; background:var(--border); margin:0.2rem 0; }
-
-/* Loading overlay for game init */
-.loading-overlay {
-  position:fixed; inset:0; z-index:99999;
-  background:var(--bg-primary);
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  gap:1rem;
-}
-.loading-text {
-  font-family:'Ma Shan Zheng',cursive;
-  font-size:1.5rem; color:var(--accent-gold);
-  animation:pulse 2s infinite;
-}
-@keyframes pulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
-.loading-bar {
-  width:200px; height:3px;
-  background:var(--border);
-  border-radius:2px;
-  overflow:hidden;
-}
-.loading-bar-inner {
-  height:100%; width:0;
-  background:var(--accent-gold);
-  transition:width 0.3s;
-}
-
-/* Tooltip */
-.game-tooltip {
-  position:fixed; z-index:10002;
-  background:var(--bg-primary);
-  border:1px solid var(--border);
-  padding:0.5rem 0.8rem;
-  font-size:0.75rem;
-  max-width:250px;
-  pointer-events:none;
-  box-shadow:var(--shadow);
-  display:none;
-  border-radius:2px;
-}
-.game-tooltip.visible { display:block; }
-
-/* Number format helper */
-.num-compact { font-variant-numeric:tabular-nums; }
-
-/* Empty state */
-.empty-state {
-  text-align:center; padding:2rem;
-  color:var(--text-dim); font-size:0.85rem;
-}
-
-/* Battle log */
-.battle-log {
-  max-height:200px; overflow-y:auto;
-  background:var(--bg-secondary);
-  border:1px solid var(--border);
-  padding:0.5rem;
-  font-size:0.7rem;
-  font-family:monospace;
-  border-radius:2px;
-}
-.battle-log-entry { padding:0.2rem 0; border-bottom:1px solid rgba(255,255,255,0.03); }
-.battle-log-entry.red { color:var(--accent-red); }
-.battle-log-entry.green { color:var(--accent-green); }
-.battle-log-entry.gold { color:var(--accent-gold); }
-
-/* Laws */
-.law-category { margin-bottom:1rem; }
-.law-category-title { font-size:0.85rem; font-weight:700; margin-bottom:0.4rem; color:var(--accent-gold); }
-.law-options { display:flex; flex-wrap:wrap; gap:0.3rem; }
-.law-option {
-  padding:0.3rem 0.7rem;
-  font-size:0.72rem;
-  background:var(--bg-card);
-  border:1px solid var(--border);
-  cursor:pointer;
-  transition:all 0.15s;
-  border-radius:2px;
-}
-.law-option:hover { border-color:var(--border-active); }
-.law-option.active { border-color:var(--accent-gold); background:rgba(201,168,76,0.1); color:var(--accent-gold); }
-
-/* Responsive */
-@media (max-width:768px) {
-  .side-panel { width:100%; max-width:100%; }
-  .modal { width:95vw; }
-  .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; }
-}
+@font-face{font-family:'GS';src:local('Noto Serif SC'),local('Microsoft YaHei'),local('SimSun'),serif}
+@font-face{font-family:'GB';src:local('Ma Shan Zheng'),local('STXingkai'),local('华文行楷'),local('KaiTi'),cursive}
+:root{--b0:#070b12;--b1:#0d1420;--b2:#14202e;--b3:#1c2c40;--b4:#253650;--bd:#2a3a52;--bh:#4a7c9b;--t:#ddd6c8;--t2:#98a0ac;--t3:#5f6878;--g:#c9a84c;--gd:rgba(201,168,76,.15);--r:#b44040;--bl:#3b82a0;--gr:#4a8c5c}
+*{margin:0;padding:0;box-sizing:border-box}html,body{width:100%;height:100%;overflow:hidden;background:var(--b0);color:var(--t);font-family:'GS',serif;font-size:14px;user-select:none}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--b1)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+input,textarea,select{user-select:text}
+#menu{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(170deg,#040810,#0b1220 50%,#121e2e)}
+#menu::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 35%,rgba(201,168,76,.04),transparent 70%);pointer-events:none}
+.mt{font-family:'GB',cursive;font-size:clamp(3rem,7vw,5.5rem);color:var(--g);text-shadow:0 0 60px rgba(201,168,76,.2),0 4px 16px rgba(0,0,0,.9);letter-spacing:.2em;z-index:1}
+.msu{font-size:clamp(.7rem,1.3vw,1rem);color:var(--t3);letter-spacing:.5em;margin:.3em 0 2.5rem;z-index:1}
+.mbs{display:flex;flex-direction:column;gap:.55rem;width:clamp(260px,28vw,380px);z-index:1}
+.mb{background:linear-gradient(135deg,rgba(20,32,46,.85),rgba(28,44,64,.85));border:1px solid var(--bd);color:var(--t);padding:.75rem 1.2rem;font-family:'GS',serif;font-size:clamp(.78rem,1.1vw,.92rem);cursor:pointer;transition:all .25s;text-align:left;position:relative;overflow:hidden;display:flex;align-items:center;gap:.7rem}
+.mb::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--g);transform:scaleY(0);transition:transform .25s}
+.mb:hover{background:linear-gradient(135deg,rgba(30,44,62,.9),rgba(37,54,80,.9));border-color:var(--bh);transform:translateX(3px)}.mb:hover::after{transform:scaleY(1)}
+.mb i{font-size:1rem;opacity:.5;width:1.4rem;text-align:center;font-style:normal}.mb em{flex:1;font-style:normal}.mb small{display:block;font-size:.6rem;color:var(--t3);margin-top:1px}
+.ov{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}.ov.on{opacity:1;pointer-events:auto}
+.mo{background:var(--b2);border:1px solid var(--bd);width:clamp(420px,65vw,880px);max-height:85vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.6)}.mo.w{width:clamp(520px,82vw,1150px)}
+.mo-h{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.1rem;border-bottom:1px solid var(--bd);flex-shrink:0}.mo-h h2{font-size:.95rem;font-weight:700;color:var(--g)}
+.xb{background:none;border:none;color:var(--t3);font-size:1.1rem;cursor:pointer;padding:.2rem .4rem}.xb:hover{color:var(--r)}
+.mo-b{padding:1.1rem;overflow-y:auto;flex:1}.mo-f{padding:.7rem 1.1rem;border-top:1px solid var(--bd);display:flex;gap:.4rem;justify-content:flex-end;flex-shrink:0}
+.fr{margin-bottom:.8rem}.fl{display:block;font-size:.72rem;color:var(--t2);margin-bottom:.25rem}
+.fi,.fsel,.ft{width:100%;background:var(--b1);border:1px solid var(--bd);color:var(--t);padding:.45rem .65rem;font-family:'GS',serif;font-size:.8rem;outline:none}
+.fi:focus,.fsel:focus,.ft:focus{border-color:var(--g)}.ft{min-height:60px;resize:vertical}.fi-s{width:100px;display:inline-block}
+.frr{display:flex;gap:.7rem;flex-wrap:wrap}.frr .fr{flex:1;min-width:90px;margin-bottom:0}
+.b{padding:.4rem .9rem;font-family:'GS',serif;font-size:.75rem;border:1px solid var(--bd);cursor:pointer;transition:all .15s}
+.bp{background:linear-gradient(135deg,var(--g),#a88a3a);color:#0a0e17;border-color:var(--g);font-weight:700}.bp:hover{filter:brightness(1.12)}
+.bs{background:var(--b3);color:var(--t)}.bs:hover{background:var(--b4);border-color:var(--bh)}
+.bd{background:rgba(180,64,64,.12);color:var(--r);border-color:var(--r)}.bd:hover{background:rgba(180,64,64,.25)}
+.bsm{padding:.2rem .55rem;font-size:.7rem}.bxs{padding:.15rem .35rem;font-size:.63rem}
+.tg{display:inline-block;padding:.08rem .35rem;font-size:.62rem;background:var(--b4);border:1px solid var(--bd);color:var(--t2)}
+.tg-g{border-color:var(--g);color:var(--g)}.tg-r{border-color:var(--r);color:var(--r)}.tg-gr{border-color:var(--gr);color:var(--gr)}
+.sb{display:flex;gap:.4rem;margin-bottom:.7rem}.sb .fi{flex:1}
+.li{display:flex;align-items:center;justify-content:space-between;padding:.55rem .8rem;background:var(--b3);border:1px solid var(--bd);margin-bottom:.3rem;transition:all .12s;cursor:pointer}
+.li:hover{border-color:var(--bh);background:var(--b4)}
+.li-i{flex:1;min-width:0}.li-n{font-size:.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-d{font-size:.68rem;color:var(--t3);margin-top:1px}.li-a{display:flex;gap:.2rem;flex-shrink:0;margin-left:.4rem}
+.tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:.7rem;flex-wrap:wrap}
+.tab{padding:.45rem .9rem;font-size:.75rem;color:var(--t3);cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;font-family:'GS',serif}.tab:hover{color:var(--t2)}.tab.on{color:var(--g);border-bottom-color:var(--g)}
+.empty{text-align:center;padding:1.2rem;color:var(--t3);font-size:.8rem}
+#game{position:fixed;inset:0;display:none;background:var(--b0)}#game.on{display:block}
+.top{position:absolute;top:0;left:0;right:0;height:42px;background:linear-gradient(180deg,rgba(7,11,18,.96),rgba(7,11,18,.82));border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 .8rem;z-index:100;backdrop-filter:blur(6px)}
+.tl{flex:1;display:flex;align-items:center}.tc_{flex:2;display:flex;align-items:center;justify-content:center;gap:.5rem}.tr_{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:.5rem}
+.tf{font-family:'GB',cursive;font-size:1.1rem;color:var(--g)}
+.ts{display:flex;align-items:center;gap:.2rem;font-size:.72rem;color:var(--t2);padding:.12rem .45rem;background:rgba(255,255,255,.02)}.ts .v{color:var(--g);font-weight:700;font-variant-numeric:tabular-nums}.ts .neg{color:var(--r)}
+.td{font-size:.75rem;color:var(--t);font-variant-numeric:tabular-nums}
+.sc_{display:flex;gap:1px}.sp{background:var(--b3);border:1px solid var(--bd);color:var(--t3);padding:.08rem .4rem;font-size:.65rem;cursor:pointer;font-family:monospace}.sp:hover,.sp.on{color:var(--g);border-color:var(--g)}
+#mc{position:absolute;top:42px;left:0;right:0;bottom:0;overflow:hidden;cursor:grab;background:#091320}#mc.drg{cursor:grabbing}
+#cv{position:absolute;transform-origin:0 0}#mi{display:block;-webkit-user-drag:none}
+.cm{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;transition:transform .1s}.cm:hover{transform:translate(-50%,-50%) scale(1.15);z-index:20}
+.cd_{width:12px;height:12px;border-radius:50%;border:2px solid var(--g);background:var(--b0);box-shadow:0 0 6px rgba(201,168,76,.3)}.cd_.cp{width:17px;height:17px;border-width:2.5px}
+.cla{position:absolute;top:100%;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.58rem;color:var(--t);text-shadow:0 1px 4px #000,0 0 8px #000;margin-top:2px;pointer-events:none;font-weight:700}
+.am{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:15;transition:left 1s linear,top 1s linear}
+.ai_{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.6rem;border-radius:3px;border:1px solid;box-shadow:0 2px 4px rgba(0,0,0,.4);font-weight:700}
+.ac_{position:absolute;top:-5px;right:-7px;font-size:.48rem;background:var(--r);color:#fff;padding:0 2.5px;border-radius:6px;min-width:12px;text-align:center;font-weight:700}
+.bm{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:12}
+.bi_{width:15px;height:15px;display:flex;align-items:center;justify-content:center;font-size:.55rem;background:rgba(80,30,30,.75);border:1px solid #8b4040;border-radius:50%}
+.pn{position:absolute;top:42px;right:0;bottom:0;width:310px;max-width:40vw;background:var(--b2);border-left:1px solid var(--bd);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .2s}.pn.op{transform:translateX(0)}
+.pn-h{display:flex;align-items:center;justify-content:space-between;padding:.6rem .8rem;border-bottom:1px solid var(--bd);flex-shrink:0}.pn-h h3{font-size:.88rem;color:var(--g)}
+.pn-b{flex:1;overflow-y:auto;padding:.8rem}
+.ps{margin-bottom:.9rem}.pst{font-size:.68rem;color:var(--t3);letter-spacing:.08em;margin-bottom:.35rem;padding-bottom:.2rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.sr{display:flex;justify-content:space-between;padding:.2rem 0;font-size:.75rem}.sr .l{color:var(--t2)}.sr .v{color:var(--t);font-weight:700}
+.bb{position:absolute;bottom:.7rem;left:50%;transform:translateX(-50%);display:flex;gap:.25rem;z-index:100;background:rgba(7,11,18,.88);padding:.3rem;border:1px solid var(--bd);backdrop-filter:blur(6px)}
+.tbb{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--b3);border:1px solid var(--bd);color:var(--t2);font-size:.82rem;cursor:pointer;position:relative}
+.tbb:hover{color:var(--g);border-color:var(--bh)}.tbb .tip{position:absolute;bottom:110%;left:50%;transform:translateX(-50%);background:var(--b0);border:1px solid var(--bd);padding:.12rem .4rem;font-size:.58rem;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s;color:var(--t2)}.tbb:hover .tip{opacity:1}
+.mm_{position:absolute;bottom:.7rem;left:.7rem;width:160px;height:95px;background:var(--b3);border:1px solid var(--bd);z-index:100;overflow:hidden}
+.mm_ img{width:100%;height:100%;object-fit:cover;opacity:.6}.mvp{position:absolute;border:1px solid var(--g);background:rgba(201,168,76,.08);pointer-events:none}
+.nf{position:absolute;top:48px;right:6px;z-index:200;width:250px;display:flex;flex-direction:column;gap:.2rem}
+.nfi{background:var(--b2);border:1px solid var(--bd);border-left:3px solid var(--g);padding:.4rem .6rem;font-size:.7rem;animation:si .2s ease-out,fo .3s 4s forwards}
+.nfi.war{border-left-color:var(--r)}.nfi.ok{border-left-color:var(--gr)}
+@keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes fo{to{opacity:0;transform:translateY(-6px)}}
+.ctx{position:fixed;z-index:10001;background:var(--b2);border:1px solid var(--bd);min-width:140px;box-shadow:0 4px 20px rgba(0,0,0,.5);display:none}.ctx.vis{display:block}
+.ci_{padding:.4rem .8rem;font-size:.75rem;cursor:pointer;display:flex;align-items:center;gap:.35rem}.ci_:hover{background:var(--b4)}.cxs{height:1px;background:var(--bd);margin:.12rem 0}
+.te{margin-bottom:1rem}.tel{font-size:.7rem;color:var(--g);margin-bottom:.4rem;padding-bottom:.15rem;border-bottom:1px solid rgba(201,168,76,.12)}
+.tns{display:flex;flex-wrap:wrap;gap:.35rem}
+.tn_{background:var(--b3);border:1px solid var(--bd);padding:.35rem .6rem;font-size:.7rem;cursor:pointer;min-width:85px;position:relative}.tn_:hover{border-color:var(--bh)}
+.tn_.ok{border-color:var(--gr);background:rgba(74,140,92,.08)}.tn_.wk{border-color:var(--bl);background:rgba(59,130,160,.08)}.tn_.lk{opacity:.4;cursor:not-allowed}
+.tnn{font-weight:700}.tnc{font-size:.6rem;color:var(--t3)}.tp_{position:absolute;bottom:0;left:0;height:2px;background:var(--bl)}
+.lc{margin-bottom:.7rem}.lct{font-size:.8rem;font-weight:700;margin-bottom:.25rem;color:var(--g)}
+.lo{display:flex;flex-wrap:wrap;gap:.2rem}
+.loi{padding:.22rem .55rem;font-size:.68rem;background:var(--b3);border:1px solid var(--bd);cursor:pointer}.loi:hover{border-color:var(--bh)}.loi.on{border-color:var(--g);background:var(--gd);color:var(--g)}
+.prog{background:var(--b1);height:5px;overflow:hidden;margin:.2rem 0}.pin{height:100%;background:var(--bl);transition:width .3s}
+.fp_{width:68px;height:45px;border:1px solid var(--bd);display:flex;overflow:hidden}.fp_ div{flex:1}
+@media(max-width:800px){.pn{width:100%;max-width:100%}.mo{width:95vw}}
 </style>
 </head>
 <body>
+<div id="menu"><div class="mt">铁与王冠</div><div class="msu">万 世 征 途</div><div class="mbs">
+<button class="mb" onclick="UI.scenarioEditor()"><i>📜</i><em>创作剧本<small>自由打造你的历史世界</small></em></button>
+<button class="mb" onclick="UI.startGame()"><i>⚔</i><em>开始游戏<small>选择剧本踏上征途</small></em></button>
+<button class="mb" onclick="UI.saveManager()"><i>💾</i><em>存档管理<small>读取与管理进度</small></em></button>
+<button class="mb" onclick="UI.techEditor()"><i>🔬</i><em>自定义科技树<small>编辑科技路线</small></em></button>
+<button class="mb" onclick="UI.cultureEditor()"><i>🏛</i><em>自定义民族文化<small>创造独特文化</small></em></button>
+<button class="mb" onclick="UI.charEditor()"><i>👤</i><em>自定义重要人物<small>塑造关键角色</small></em></button>
+<button class="mb" onclick="UI.unitEditor()"><i>🛡</i><em>自定义兵种<small>设计特色军事力量</small></em></button>
+</div><div class="mver">v0.2</div></div>
 
-<!-- ===== MAIN MENU ===== -->
-<div id="mainMenu">
-  <div class="menu-title">铁与王冠</div>
-  <div class="menu-subtitle">万 世 征 途</div>
-  <div class="menu-buttons">
-    <button class="menu-btn" onclick="UI.openScenarioEditor()">
-      <span class="btn-icon">📜</span>创作剧本
-      <span class="menu-btn-sub">自由打造你的历史世界</span>
-    </button>
-    <button class="menu-btn" onclick="UI.startGame()">
-      <span class="btn-icon">⚔</span>开始游戏
-      <span class="menu-btn-sub">选择剧本，踏上征途</span>
-    </button>
-    <button class="menu-btn" onclick="UI.openSaveManager()">
-      <span class="btn-icon">💾</span>存档管理
-      <span class="menu-btn-sub">读取与管理你的进度</span>
-    </button>
-    <button class="menu-btn" onclick="UI.openTechEditor()">
-      <span class="btn-icon">🔬</span>自定义科技树
-      <span class="menu-btn-sub">编辑科技发展路线</span>
-    </button>
-    <button class="menu-btn" onclick="UI.openCultureEditor()">
-      <span class="btn-icon">🏛</span>自定义民族文化
-      <span class="menu-btn-sub">创造独特的民族与文化</span>
-    </button>
-    <button class="menu-btn" onclick="UI.openCharacterEditor()">
-      <span class="btn-icon">👤</span>自定义重要人物
-      <span class="menu-btn-sub">塑造历史中的关键角色</span>
-    </button>
-    <button class="menu-btn" onclick="UI.openUnitEditor()">
-      <span class="btn-icon">🛡</span>自定义兵种
-      <span class="menu-btn-sub">设计民族特色军事力量</span>
-    </button>
-  </div>
-  <div class="version-tag">v0.1 核心原型</div>
+<div id="ov" class="ov" onclick="if(event.target===this)UI.closeModal()"><div class="mo" id="moc"><div class="mo-h"><h2 id="mot"></h2><button class="xb" onclick="UI.closeModal()">✕</button></div><div class="mo-b" id="mob"></div><div class="mo-f" id="mof"></div></div></div>
+
+<div id="game">
+<div class="top"><div class="tl"><span class="tf" id="gF">—</span></div>
+<div class="tc_"><div class="ts">💰<span class="v" id="gG">0</span><span class="v" style="font-size:.58rem;margin-left:2px" id="gI"></span></div><div class="ts">👥<span class="v" id="gP">0</span></div><div class="ts">⚔<span class="v" id="gA">0</span></div><div class="ts">🔬<span class="v" id="gT">0</span></div></div>
+<div class="tr_"><span class="td" id="gTm">第1年1月1日</span><div class="sc_"><button class="sp" onclick="G.spd(0)" id="s0">⏸</button><button class="sp on" onclick="G.spd(1)" id="s1">▶</button><button class="sp" onclick="G.spd(2)" id="s2">▶▶</button><button class="sp" onclick="G.spd(3)" id="s3">▶▶▶</button></div></div></div>
+<div id="mc"><div id="cv"><img id="mi" draggable="false"></div></div>
+<div class="mm_" id="mm"><img id="mmi" draggable="false"><div class="mvp" id="mmv"></div></div>
+<div class="nf" id="nf"></div>
+<div class="bb">
+<button class="tbb" onclick="UI.panel('city')">🏰<span class="tip">城池</span></button>
+<button class="tbb" onclick="UI.panel('army')">⚔<span class="tip">军事</span></button>
+<button class="tbb" onclick="UI.panel('tech')">🔬<span class="tip">科技</span></button>
+<button class="tbb" onclick="UI.panel('diplo')">📜<span class="tip">外交</span></button>
+<button class="tbb" onclick="UI.panel('law')">⚖<span class="tip">法律</span></button>
+<button class="tbb" onclick="UI.panel('fac')">🏴<span class="tip">派系</span></button>
+<button class="tbb" onclick="G.save()">💾<span class="tip">保存</span></button>
+<button class="tbb" onclick="UI.toMenu()">🔙<span class="tip">菜单</span></button>
 </div>
-
-<!-- ===== MODAL CONTAINER ===== -->
-<div id="modalOverlay" class="modal-overlay" onclick="if(event.target===this)UI.closeModal()">
-  <div id="modalContent" class="modal">
-    <div class="modal-header">
-      <h2 id="modalTitle">标题</h2>
-      <button class="modal-close" onclick="UI.closeModal()">✕</button>
-    </div>
-    <div class="modal-body" id="modalBody"></div>
-    <div class="modal-footer" id="modalFooter"></div>
-  </div>
+<div class="pn" id="pn"><div class="pn-h"><h3 id="pnt">面板</h3><div><button class="xb" id="pnBk" onclick="UI.panelBack()" style="display:none;font-size:.8rem;margin-right:.3rem">←</button><button class="xb" onclick="UI.closePanel()">✕</button></div></div><div class="pn-b" id="pnb"></div></div>
 </div>
-
-<!-- ===== GAME UI ===== -->
-<div id="gameUI">
-  <!-- Top Bar -->
-  <div class="game-topbar">
-    <div class="topbar-section topbar-left">
-      <span class="topbar-faction" id="playerFactionName">—</span>
-    </div>
-    <div class="topbar-section topbar-center">
-      <div class="topbar-stat">💰 <span class="val" id="statGold">0</span></div>
-      <div class="topbar-stat">👥 <span class="val" id="statPop">0</span></div>
-      <div class="topbar-stat">⚔ <span class="val" id="statArmy">0</span></div>
-      <div class="topbar-stat">🔬 <span class="val" id="statTech">0</span></div>
-    </div>
-    <div class="topbar-section topbar-right">
-      <span class="time-display" id="timeDisplay">第 1 年 1 月</span>
-      <div class="speed-controls">
-        <button class="speed-btn" onclick="Game.setSpeed(0)" id="speed0">⏸</button>
-        <button class="speed-btn active" onclick="Game.setSpeed(1)" id="speed1">▶</button>
-        <button class="speed-btn" onclick="Game.setSpeed(2)" id="speed2">▶▶</button>
-        <button class="speed-btn" onclick="Game.setSpeed(3)" id="speed3">▶▶▶</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Map -->
-  <div id="mapContainer">
-    <div id="mapCanvas">
-      <img id="mapImage" draggable="false">
-    </div>
-  </div>
-
-  <!-- Minimap -->
-  <div class="minimap" id="minimap">
-    <img id="minimapImg" draggable="false">
-    <div class="minimap-viewport" id="minimapViewport"></div>
-  </div>
-
-  <!-- Notifications -->
-  <div class="notifications" id="notifications"></div>
-
-  <!-- Bottom toolbar -->
-  <div class="game-bottombar">
-    <button class="toolbar-btn" onclick="UI.togglePanel('city')" id="tbCity">
-      🏰<span class="tooltip">城池管理</span>
-    </button>
-    <button class="toolbar-btn" onclick="UI.togglePanel('army')" id="tbArmy">
-      ⚔<span class="tooltip">军事</span>
-    </button>
-    <button class="toolbar-btn" onclick="UI.togglePanel('tech')" id="tbTech">
-      🔬<span class="tooltip">科技</span>
-    </button>
-    <button class="toolbar-btn" onclick="UI.togglePanel('diplomacy')" id="tbDiplo">
-      📜<span class="tooltip">外交</span>
-    </button>
-    <button class="toolbar-btn" onclick="UI.togglePanel('law')" id="tbLaw">
-      ⚖<span class="tooltip">法律</span>
-    </button>
-    <button class="toolbar-btn" onclick="UI.togglePanel('faction')" id="tbFaction">
-      🏴<span class="tooltip">派系</span>
-    </button>
-    <button class="toolbar-btn" onclick="Game.saveGame()">
-      💾<span class="tooltip">保存</span>
-    </button>
-    <button class="toolbar-btn" onclick="UI.backToMenu()">
-      🔙<span class="tooltip">主菜单</span>
-    </button>
-  </div>
-
-  <!-- Side Panel -->
-  <div class="side-panel" id="sidePanel">
-    <div class="panel-header">
-      <h3 id="panelTitle">面板</h3>
-      <button class="modal-close" onclick="UI.closePanel()">✕</button>
-    </div>
-    <div class="panel-body" id="panelBody"></div>
-  </div>
-</div>
-
-<!-- Context Menu -->
-<div class="context-menu" id="contextMenu"></div>
-
-<!-- Tooltip -->
-<div class="game-tooltip" id="gameTooltip"></div>
+<div class="ctx" id="ctx"></div>
 
 <script>
-// ============================================================
-// UTILITY FUNCTIONS
-// ============================================================
-const $ = id => document.getElementById(id);
-const qs = s => document.querySelector(s);
-const qsa = s => document.querySelectorAll(s);
-const clamp = (v,min,max) => Math.max(min,Math.min(max,v));
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-const pick = arr => arr[Math.floor(Math.random()*arr.length)];
-const randInt = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
-const fmtNum = n => {
-  if(n>=1e9) return (n/1e9).toFixed(1)+'B';
-  if(n>=1e6) return (n/1e6).toFixed(1)+'M';
-  if(n>=1e3) return (n/1e3).toFixed(1)+'K';
-  return String(Math.floor(n));
+// ==== UTILS ====
+const $=id=>document.getElementById(id),U=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6),P=a=>a[Math.floor(Math.random()*a.length)],R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a,CL=(v,a,b)=>Math.max(a,Math.min(b,v));
+const F=n=>{if(n==null)return'0';const a=Math.abs(n);if(a>=1e9)return(n/1e9).toFixed(1)+'B';if(a>=1e6)return(n/1e6).toFixed(1)+'M';if(a>=1e3)return(n/1e3).toFixed(1)+'K';return String(Math.round(n))};
+const E=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const J=o=>JSON.parse(JSON.stringify(o));
+
+// ==== STORAGE (localStorage wrapper) ====
+const LS={
+  set(k,v){try{localStorage.setItem('ic_'+k,JSON.stringify(v));return true}catch(e){return false}},
+  get(k){try{const d=localStorage.getItem('ic_'+k);return d?JSON.parse(d):null}catch(e){return null}},
+  del(k){localStorage.removeItem('ic_'+k)},
+  keys(prefix){const r=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('ic_'+prefix))r.push(k.slice(3))}return r}
 };
 
-// ============================================================
-// DEFAULT DATA
-// ============================================================
-const DEFAULT_TECH_TREE = [
-  {era:'远古时代', techs:[
-    {id:'t_fire',name:'用火',cost:10,desc:'掌握火焰的力量',effects:{pop_growth:0.05}},
-    {id:'t_stone',name:'石器',cost:15,desc:'制造石制工具与武器',effects:{army_atk:2}},
-    {id:'t_farming',name:'原始农耕',cost:20,desc:'开始定居农业',effects:{tax_rate:0.05,pop_growth:0.1}},
-    {id:'t_language',name:'语言文字',cost:25,desc:'记录与传承知识',effects:{research_speed:0.1}},
-  ]},
-  {era:'古典时代', techs:[
-    {id:'t_bronze',name:'青铜冶炼',cost:40,desc:'青铜时代来临',effects:{army_atk:5},requires:['t_stone']},
-    {id:'t_writing',name:'书写系统',cost:50,desc:'正式的文字记录',effects:{research_speed:0.2},requires:['t_language']},
-    {id:'t_irrigation',name:'灌溉系统',cost:45,desc:'大规模农业灌溉',effects:{tax_rate:0.1,pop_growth:0.15},requires:['t_farming']},
-    {id:'t_wheel',name:'轮子',cost:35,desc:'运输革命',effects:{army_speed:0.1}},
-    {id:'t_walls',name:'城墙',cost:55,desc:'城市防御工事',effects:{city_def:10},requires:['t_stone']},
-  ]},
-  {era:'中世纪', techs:[
-    {id:'t_iron',name:'铁器锻造',cost:80,desc:'铁制武器与工具',effects:{army_atk:10},requires:['t_bronze']},
-    {id:'t_cavalry',name:'骑兵战术',cost:90,desc:'骑兵成为主力',effects:{army_atk:8,army_speed:0.2},requires:['t_wheel']},
-    {id:'t_castle',name:'城堡',cost:100,desc:'坚固的堡垒防御',effects:{city_def:25},requires:['t_walls']},
-    {id:'t_trade',name:'贸易路线',cost:70,desc:'远程商业贸易',effects:{tax_rate:0.15}},
-    {id:'t_navy1',name:'帆船',cost:85,desc:'海上航行能力',effects:{can_naval:true},requires:['t_wheel']},
-  ]},
-  {era:'火药时代', techs:[
-    {id:'t_gunpowder',name:'火药',cost:150,desc:'改变战争形态',effects:{army_atk:20},requires:['t_iron']},
-    {id:'t_printing',name:'印刷术',cost:120,desc:'知识大规模传播',effects:{research_speed:0.3},requires:['t_writing']},
-    {id:'t_banking',name:'银行制度',cost:130,desc:'金融与信贷',effects:{tax_rate:0.2},requires:['t_trade']},
-    {id:'t_cannon',name:'火炮',cost:180,desc:'攻城利器',effects:{army_atk:15,siege:20},requires:['t_gunpowder']},
-    {id:'t_galleon',name:'大型帆船',cost:160,desc:'远洋航行',effects:{naval_power:15},requires:['t_navy1']},
-  ]},
-  {era:'工业时代', techs:[
-    {id:'t_steam',name:'蒸汽机',cost:250,desc:'工业革命开始',effects:{tax_rate:0.3,pop_growth:0.2},requires:['t_banking']},
-    {id:'t_rifle',name:'步枪',cost:220,desc:'火器进化',effects:{army_atk:30},requires:['t_gunpowder']},
-    {id:'t_railroad',name:'铁路',cost:280,desc:'快速运输网络',effects:{army_speed:0.4},requires:['t_steam']},
-    {id:'t_ironclad',name:'铁甲舰',cost:300,desc:'海上霸权',effects:{naval_power:30},requires:['t_galleon','t_steam']},
-    {id:'t_telegraph',name:'电报',cost:200,desc:'即时通信',effects:{research_speed:0.2}},
-  ]},
-  {era:'现代', techs:[
-    {id:'t_electricity',name:'电力',cost:400,desc:'电气化时代',effects:{tax_rate:0.4,pop_growth:0.15},requires:['t_steam']},
-    {id:'t_aircraft',name:'飞机',cost:500,desc:'制空权',effects:{can_air:true,army_atk:25},requires:['t_steam']},
-    {id:'t_tank',name:'坦克',cost:450,desc:'装甲突击',effects:{army_atk:40},requires:['t_rifle']},
-    {id:'t_carrier',name:'航空母舰',cost:600,desc:'海上移动机场',effects:{naval_power:50},requires:['t_ironclad','t_aircraft']},
-    {id:'t_nuclear',name:'核技术',cost:800,desc:'终极威慑',effects:{nuke:true},requires:['t_electricity']},
-    {id:'t_internet',name:'互联网',cost:700,desc:'信息时代',effects:{research_speed:0.5},requires:['t_telegraph','t_electricity']},
-    {id:'t_satellite',name:'卫星',cost:750,desc:'太空监控',effects:{vision:100},requires:['t_aircraft']},
-  ]},
+// ==== DEFAULT DATA ====
+const D_TECH=[
+{era:'远古时代',techs:[{id:'t_fire',name:'用火',cost:10,desc:'掌握火焰',fx:{pg:.05}},{id:'t_stone',name:'石器',cost:15,desc:'石制工具',fx:{aa:2}},{id:'t_farm',name:'农耕',cost:20,desc:'定居农业',fx:{tx:.05,pg:.1}},{id:'t_lang',name:'文字',cost:25,desc:'知识传承',fx:{rs:.1}}]},
+{era:'古典时代',techs:[{id:'t_bronze',name:'青铜',cost:40,fx:{aa:5},req:['t_stone']},{id:'t_write',name:'书写',cost:50,fx:{rs:.2},req:['t_lang']},{id:'t_irrig',name:'灌溉',cost:45,fx:{tx:.1,pg:.15},req:['t_farm']},{id:'t_wheel',name:'轮子',cost:35,fx:{as:.1}},{id:'t_wall',name:'城墙',cost:55,fx:{cd:10},req:['t_stone']}]},
+{era:'中世纪',techs:[{id:'t_iron',name:'铁器',cost:80,fx:{aa:10},req:['t_bronze']},{id:'t_cav',name:'骑兵',cost:90,fx:{aa:8,as:.2},req:['t_wheel']},{id:'t_castle',name:'城堡',cost:100,fx:{cd:25},req:['t_wall']},{id:'t_trade',name:'贸易',cost:70,fx:{tx:.15}},{id:'t_sail',name:'帆船',cost:85,fx:{nav:1},req:['t_wheel']}]},
+{era:'火药时代',techs:[{id:'t_gun',name:'火药',cost:150,fx:{aa:20},req:['t_iron']},{id:'t_print',name:'印刷',cost:120,fx:{rs:.3},req:['t_write']},{id:'t_bank',name:'银行',cost:130,fx:{tx:.2},req:['t_trade']},{id:'t_cannon',name:'火炮',cost:180,fx:{aa:15,sg:20},req:['t_gun']},{id:'t_gal',name:'大帆船',cost:160,fx:{np:15},req:['t_sail']}]},
+{era:'工业时代',techs:[{id:'t_steam',name:'蒸汽机',cost:250,fx:{tx:.3,pg:.2},req:['t_bank']},{id:'t_rifle',name:'步枪',cost:220,fx:{aa:30},req:['t_gun']},{id:'t_rail',name:'铁路',cost:280,fx:{as:.4},req:['t_steam']},{id:'t_iclad',name:'铁甲舰',cost:300,fx:{np:30},req:['t_gal','t_steam']}]},
+{era:'现代',techs:[{id:'t_elec',name:'电力',cost:400,fx:{tx:.4},req:['t_steam']},{id:'t_air',name:'飞机',cost:500,fx:{air:1,aa:25},req:['t_steam']},{id:'t_tank',name:'坦克',cost:450,fx:{aa:40},req:['t_rifle']},{id:'t_carrier',name:'航母',cost:600,fx:{np:50},req:['t_iclad','t_air']},{id:'t_nuke',name:'核武',cost:800,fx:{nk:1},req:['t_elec']},{id:'t_net',name:'互联网',cost:700,fx:{rs:.5},req:['t_elec']}]}
 ];
-
-const DEFAULT_CULTURES = [
-  {id:'c_han',name:'汉族',desc:'中原大地的主要民族',bonuses:{pop_growth:0.1,research:0.05},units:['u_jian','u_nu']},
-  {id:'c_nomad',name:'游牧民族',desc:'草原上的骑马勇士',bonuses:{army_speed:0.2,army_atk:5},units:['u_qibing']},
-  {id:'c_viking',name:'维京人',desc:'北方海上的勇猛战士',bonuses:{naval_power:10,army_atk:3},units:['u_berserker']},
-  {id:'c_roman',name:'罗马人',desc:'法律与秩序的缔造者',bonuses:{tax_rate:0.1,city_def:5},units:['u_legion']},
-  {id:'c_arab',name:'阿拉伯人',desc:'沙漠中的商贸与信仰',bonuses:{tax_rate:0.15,research:0.1},units:['u_mamluk']},
-];
-
-const DEFAULT_UNITS = [
-  {id:'u_militia',name:'民兵',culture:'通用',type:'land',atk:3,def:2,cost:10,upkeep:1,desc:'最基本的步兵'},
-  {id:'u_jian',name:'剑士',culture:'汉族',type:'land',atk:8,def:5,cost:30,upkeep:3,desc:'训练有素的近战步兵'},
-  {id:'u_nu',name:'弩兵',culture:'汉族',type:'land',atk:10,def:3,cost:35,upkeep:4,desc:'远程精准打击'},
-  {id:'u_qibing',name:'铁骑',culture:'游牧民族',type:'land',atk:12,def:6,cost:50,upkeep:5,desc:'草原上的闪电骑兵'},
-  {id:'u_berserker',name:'狂战士',culture:'维京人',type:'land',atk:15,def:2,cost:40,upkeep:4,desc:'狂暴的近战战士'},
-  {id:'u_legion',name:'军团兵',culture:'罗马人',type:'land',atk:9,def:9,cost:45,upkeep:4,desc:'纪律严明的重步兵'},
-  {id:'u_mamluk',name:'马穆鲁克',culture:'阿拉伯人',type:'land',atk:11,def:7,cost:55,upkeep:5,desc:'精英骑兵卫队'},
-  {id:'u_ship',name:'战船',culture:'通用',type:'naval',atk:10,def:8,cost:80,upkeep:6,desc:'基础海军力量'},
-  {id:'u_fighter',name:'战斗机',culture:'通用',type:'air',atk:20,def:5,cost:200,upkeep:15,desc:'空中优势'},
-  {id:'u_bomber',name:'轰炸机',culture:'通用',type:'air',atk:30,def:3,cost:300,upkeep:20,desc:'战略轰炸'},
-];
-
-const DEFAULT_LAWS = {
-  governance: {name:'政体',options:['部落制','封建制','君主专制','寡头共和','民主共和','军政府'],current:'封建制'},
-  economy: {name:'经济制度',options:['自给自足','封建庄园','商业经济','计划经济','市场经济'],current:'封建庄园'},
-  military: {name:'兵役制度',options:['部族征召','封建骑士','征兵制','职业军队','全民皆兵'],current:'封建骑士'},
-  tax: {name:'税收政策',options:['免税','轻税','中等税率','重税','榨取'],current:'中等税率'},
-  religion: {name:'宗教政策',options:['泛神信仰','国教制','宗教宽容','政教分离','无神论'],current:'宗教宽容'},
-  citizenship: {name:'公民权',options:['奴隶制','农奴制','有限公民权','完全公民权'],current:'有限公民权'},
-  trade: {name:'贸易政策',options:['闭关锁国','保护主义','自由贸易'],current:'保护主义'},
-  education: {name:'教育制度',options:['无教育','精英教育','义务教育','全民高等教育'],current:'精英教育'},
-};
-
-const LAW_EFFECTS = {
-  governance: {'部落制':{pop_growth:0.05},'封建制':{tax_rate:0.05},'君主专制':{army_atk:5},'寡头共和':{tax_rate:0.1},'民主共和':{pop_growth:0.1,research:0.1},'军政府':{army_atk:10,pop_growth:-0.05}},
-  tax: {'免税':{pop_growth:0.15,tax_mult:0},'轻税':{pop_growth:0.05,tax_mult:0.5},'中等税率':{tax_mult:1},'重税':{tax_mult:1.5,pop_growth:-0.05},'榨取':{tax_mult:2,pop_growth:-0.15}},
-  military: {'部族征召':{recruit_cost:0.5,army_atk:-3},'封建骑士':{recruit_cost:1},'征兵制':{recruit_cost:0.7,army_atk:2},'职业军队':{recruit_cost:1.5,army_atk:8},'全民皆兵':{recruit_cost:0.3,army_atk:5,pop_growth:-0.1}},
-};
-
-const DEFAULT_CHARACTERS = [
-  {id:'ch_1',name:'始皇大帝',culture:'汉族',skills:{command:90,admin:85,diplomacy:60},desc:'千古一帝'},
-  {id:'ch_2',name:'铁木真',culture:'游牧民族',skills:{command:95,admin:70,diplomacy:50},desc:'一代天骄'},
-  {id:'ch_3',name:'凯撒',culture:'罗马人',skills:{command:88,admin:80,diplomacy:75},desc:'罗马的征服者'},
-];
-
-// ============================================================
-// GAME STATE
-// ============================================================
-let GameState = {
-  scenario: null,
-  playing: false,
-  speed: 1, // 0=paused,1=normal,2=fast,3=fastest
-  time: { year:1, month:1, day:1, tickAccum:0 },
-  playerFaction: null,
-  playerMode: 'nation', // 'nation' or 'character'
-  playerCharacter: null,
-  factions: [],
-  cities: [],
-  armies: [],
-  bandits: [],
-  techTree: JSON.parse(JSON.stringify(DEFAULT_TECH_TREE)),
-  cultures: JSON.parse(JSON.stringify(DEFAULT_CULTURES)),
-  units: JSON.parse(JSON.stringify(DEFAULT_UNITS)),
-  characters: JSON.parse(JSON.stringify(DEFAULT_CHARACTERS)),
-  laws: JSON.parse(JSON.stringify(DEFAULT_LAWS)),
-  researchedTechs: {},
-  currentResearch: null,
-  researchProgress: 0,
-  mapImage: null, // base64 or URL
-  relations: {}, // factionId -> factionId -> number
-  wars: [], // {attacker, defender, startYear}
-  notifications: [],
-  customScenarios: [],
-};
-
-// ============================================================
-// STORAGE
-// ============================================================
-const Storage = {
-  save(key, data) {
-    try { localStorage.setItem('ironCrown_'+key, JSON.stringify(data)); return true; }
-    catch(e) { console.warn('Save failed',e); return false; }
-  },
-  load(key) {
-    try { const d = localStorage.getItem('ironCrown_'+key); return d ? JSON.parse(d) : null; }
-    catch(e) { return null; }
-  },
-  delete(key) { localStorage.removeItem('ironCrown_'+key); },
-  listSaves() {
-    const saves = [];
-    for(let i=0;i<localStorage.length;i++){
-      const k = localStorage.key(i);
-      if(k.startsWith('ironCrown_save_')){
-        try {
-          const d = JSON.parse(localStorage.getItem(k));
-          saves.push({key:k.replace('ironCrown_',''), name:d._saveName||k, date:d._saveDate||'', faction:d.playerFaction});
-        } catch(e){}
-      }
-    }
-    return saves;
-  },
-};
-
-// ============================================================
-// MAP CONTROLLER
-// ============================================================
-const MapCtrl = {
-  scale: 1,
-  offsetX: 0,
-  offsetY: 0,
-  isDragging: false,
-  lastX: 0,
-  lastY: 0,
-  imgW: 0,
-  imgH: 0,
-
-  init() {
-    const container = $('mapContainer');
-    const img = $('mapImage');
-    
-    container.addEventListener('mousedown', e => {
-      if(e.button===2) return;
-      this.isDragging = true;
-      this.lastX = e.clientX;
-      this.lastY = e.clientY;
-      container.classList.add('dragging');
-    });
-    window.addEventListener('mousemove', e => {
-      if(!this.isDragging) return;
-      const dx = e.clientX - this.lastX;
-      const dy = e.clientY - this.lastY;
-      this.lastX = e.clientX;
-      this.lastY = e.clientY;
-      this.offsetX += dx;
-      this.offsetY += dy;
-      this.applyTransform();
-    });
-    window.addEventListener('mouseup', () => {
-      this.isDragging = false;
-      container.classList.remove('dragging');
-    });
-    container.addEventListener('wheel', e => {
-      e.preventDefault();
-      const rect = container.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-      const oldScale = this.scale;
-      const delta = e.deltaY > 0 ? 0.9 : 1.1;
-      this.scale = clamp(this.scale * delta, 0.2, 5);
-      const ratio = this.scale / oldScale;
-      this.offsetX = mx - (mx - this.offsetX) * ratio;
-      this.offsetY = my - (my - this.offsetY) * ratio;
-      this.applyTransform();
-    });
-
-    // Right-click for placing things
-    container.addEventListener('contextmenu', e => {
-      e.preventDefault();
-      const rect = container.getBoundingClientRect();
-      const mapX = (e.clientX - rect.left - this.offsetX) / this.scale;
-      const mapY = (e.clientY - rect.top - this.offsetY) / this.scale;
-      UI.showMapContextMenu(e.clientX, e.clientY, mapX, mapY);
-    });
-
-    img.onload = () => {
-      this.imgW = img.naturalWidth;
-      this.imgH = img.naturalHeight;
-      // Center map
-      const cw = container.clientWidth;
-      const ch = container.clientHeight;
-      this.scale = Math.min(cw / this.imgW, ch / this.imgH) * 0.9;
-      this.offsetX = (cw - this.imgW * this.scale) / 2;
-      this.offsetY = (ch - this.imgH * this.scale) / 2;
-      this.applyTransform();
-      // Minimap
-      $('minimapImg').src = img.src;
-    };
-  },
-
-  loadMap(src) {
-    $('mapImage').src = src;
-  },
-
-  applyTransform() {
-    const canvas = $('mapCanvas');
-    canvas.style.transform = `translate(${this.offsetX}px,${this.offsetY}px) scale(${this.scale})`;
-    this.updateMinimap();
-  },
-
-  updateMinimap() {
-    const container = $('mapContainer');
-    const mm = $('minimap');
-    if(!this.imgW) return;
-    const mmW = mm.clientWidth;
-    const mmH = mm.clientHeight;
-    const scaleX = mmW / this.imgW;
-    const scaleY = mmH / this.imgH;
-    const cw = container.clientWidth;
-    const ch = container.clientHeight;
-    const vp = $('minimapViewport');
-    const vpW = (cw / this.scale) * scaleX;
-    const vpH = (ch / this.scale) * scaleY;
-    const vpX = (-this.offsetX / this.scale) * scaleX;
-    const vpY = (-this.offsetY / this.scale) * scaleY;
-    vp.style.width = clamp(vpW,5,mmW)+'px';
-    vp.style.height = clamp(vpH,5,mmH)+'px';
-    vp.style.left = clamp(vpX,0,mmW)+'px';
-    vp.style.top = clamp(vpY,0,mmH)+'px';
-  },
-
-  screenToMap(sx, sy) {
-    const container = $('mapContainer');
-    const rect = container.getBoundingClientRect();
-    return {
-      x: (sx - rect.left - this.offsetX) / this.scale,
-      y: (sy - rect.top - this.offsetY) / this.scale,
-    };
-  },
-
-  mapToScreen(mx, my) {
-    const container = $('mapContainer');
-    const rect = container.getBoundingClientRect();
-    return {
-      x: mx * this.scale + this.offsetX + rect.left,
-      y: my * this.scale + this.offsetY + rect.top,
-    };
-  },
-
-  renderEntities() {
-    // Remove old markers
-    document.querySelectorAll('.city-marker,.army-marker,.bandit-marker').forEach(el=>el.remove());
-    const canvas = $('mapCanvas');
-
-    // Cities
-    GameState.cities.forEach(city => {
-      const el = document.createElement('div');
-      el.className = 'city-marker';
-      el.style.left = city.x + 'px';
-      el.style.top = city.y + 'px';
-      const faction = GameState.factions.find(f=>f.id===city.factionId);
-      const color = faction ? faction.color : '#888';
-      const isCapital = faction && faction.capitalId === city.id;
-      el.innerHTML = `
-        <div class="city-dot ${isCapital?'capital':''}" style="border-color:${color};${isCapital?'background:'+color:''}"></div>
-        <div class="city-label">${city.name}</div>
-      `;
-      el.onclick = (e) => { e.stopPropagation(); UI.openCityPanel(city.id); };
-      canvas.appendChild(el);
-    });
-
-    // Armies
-    GameState.armies.forEach(army => {
-      const el = document.createElement('div');
-      el.className = 'army-marker';
-      el.style.left = army.x + 'px';
-      el.style.top = army.y + 'px';
-      const faction = GameState.factions.find(f=>f.id===army.factionId);
-      const color = faction ? faction.color : '#888';
-      const typeIcon = army.type==='naval'?'⛵':army.type==='air'?'✈':'⚔';
-      el.innerHTML = `
-        <div class="army-icon" style="background:${color}22;border-color:${color};color:${color}">${typeIcon}</div>
-        <div class="army-count">${fmtNum(army.troops)}</div>
-      `;
-      el.onclick = (e) => { e.stopPropagation(); UI.openArmyPanel(army.id); };
-      canvas.appendChild(el);
-    });
-
-    // Bandits
-    GameState.bandits.forEach(b => {
-      const el = document.createElement('div');
-      el.className = 'bandit-marker';
-      el.style.left = b.x + 'px';
-      el.style.top = b.y + 'px';
-      el.innerHTML = `<div class="bandit-icon">💀</div>`;
-      el.onclick = (e) => { e.stopPropagation(); UI.showBanditInfo(b); };
-      canvas.appendChild(el);
-    });
-  }
-};
-
-// ============================================================
-// GAME LOGIC
-// ============================================================
-const Game = {
-  tickInterval: null,
-  TICK_MS: [0, 1000, 400, 100], // speed 0-3
-
-  setSpeed(s) {
-    GameState.speed = s;
-    document.querySelectorAll('.speed-btn').forEach((btn,i)=>{
-      btn.classList.toggle('active', i===s);
-    });
-    this.restartTick();
-  },
-
-  restartTick() {
-    if(this.tickInterval) clearInterval(this.tickInterval);
-    if(GameState.speed > 0) {
-      this.tickInterval = setInterval(() => this.tick(), this.TICK_MS[GameState.speed]);
-    }
-  },
-
-  tick() {
-    if(!GameState.playing) return;
-    const t = GameState.time;
-    t.day++;
-    if(t.day > 30) { t.day = 1; t.month++; this.monthlyTick(); }
-    if(t.month > 12) { t.month = 1; t.year++; this.yearlyTick(); }
-    
-    // Update display
-    $('timeDisplay').textContent = `第 ${fmtNum(t.year)} 年 ${t.month} 月 ${t.day} 日`;
-    
-    // Move armies
-    this.moveArmies();
-    
-    // Check battles
-    this.checkBattles();
-
-    // Move bandits randomly sometimes
-    if(Math.random()<0.02) this.moveBandits();
-
-    // AI tick
-    if(t.day % 5 === 0) AI.tick();
-
-    // Render
-    MapCtrl.renderEntities();
-    this.updateTopbar();
-  },
-
-  monthlyTick() {
-    // Tax collection
-    const playerFaction = GameState.factions.find(f=>f.id===GameState.playerFaction);
-    if(!playerFaction) return;
-    
-    const taxMult = this.getLawEffect('tax','tax_mult') ?? 1;
-    
-    GameState.factions.forEach(faction => {
-      let income = 0;
-      let totalPop = 0;
-      const fCities = GameState.cities.filter(c=>c.factionId===faction.id);
-      fCities.forEach(city => {
-        const baseTax = city.population * 0.01 * (1 + city.economyLevel * 0.1);
-        income += baseTax * taxMult;
-        totalPop += city.population;
-        // Population growth
-        const growthRate = 0.001 + (this.getTechEffect('pop_growth')||0) + (this.getLawEffect('tax','pop_growth')||0);
-        city.population = Math.floor(city.population * (1 + growthRate));
-      });
-      // Army upkeep
-      const fArmies = GameState.armies.filter(a=>a.factionId===faction.id);
-      let upkeep = 0;
-      fArmies.forEach(a => { upkeep += a.upkeep || a.troops * 0.5; });
-      faction.gold = (faction.gold||0) + income - upkeep;
-      faction.totalPop = totalPop;
-    });
-
-    // Research progress
-    if(GameState.currentResearch && playerFaction) {
-      const speed = 1 + (this.getTechEffect('research_speed')||0);
-      GameState.researchProgress += speed * 2;
-      const tech = this.findTech(GameState.currentResearch);
-      if(tech && GameState.researchProgress >= tech.cost) {
-        GameState.researchedTechs[tech.id] = true;
-        UI.notify(`科技「${tech.name}」研究完成！`, 'peace');
-        GameState.currentResearch = null;
-        GameState.researchProgress = 0;
-      }
-    }
-  },
-
-  yearlyTick() {
-    // Yearly events
-    if(Math.random()<0.1) {
-      // Random bandit spawn
-      if(MapCtrl.imgW > 0) {
-        GameState.bandits.push({
-          id:uid(),
-          name:pick(['黑山贼','流寇','海盗','叛军','山匪']),
-          x:randInt(50,MapCtrl.imgW-50),
-          y:randInt(50,MapCtrl.imgH-50),
-          troops:randInt(50,500),
-          atk:randInt(3,10),
-          def:randInt(2,8),
-        });
-        UI.notify('有新的匪寇出没！','war');
-      }
-    }
-  },
-
-  moveArmies() {
-    GameState.armies.forEach(army => {
-      if(!army.targetX && !army.targetY) return;
-      const dx = army.targetX - army.x;
-      const dy = army.targetY - army.y;
-      const dist = Math.sqrt(dx*dx+dy*dy);
-      const speed = (army.type==='air'?8:army.type==='naval'?4:3) * (1+(this.getTechEffect('army_speed')||0));
-      if(dist < speed) {
-        army.x = army.targetX;
-        army.y = army.targetY;
-        army.targetX = null;
-        army.targetY = null;
-        // Check if arrived at target city
-        if(army.targetCityId) {
-          const targetCity = GameState.cities.find(c=>c.id===army.targetCityId);
-          if(targetCity && targetCity.factionId !== army.factionId) {
-            this.siegeCity(army, targetCity);
-          }
-          army.targetCityId = null;
-        }
-      } else {
-        army.x += (dx/dist)*speed;
-        army.y += (dy/dist)*speed;
-      }
-    });
-  },
-
-  moveBandits() {
-    GameState.bandits.forEach(b => {
-      b.x = clamp(b.x + randInt(-30,30), 10, MapCtrl.imgW-10);
-      b.y = clamp(b.y + randInt(-30,30), 10, MapCtrl.imgH-10);
-    });
-  },
-
-  checkBattles() {
-    // Army vs Army
-    for(let i=0;i<GameState.armies.length;i++){
-      for(let j=i+1;j<GameState.armies.length;j++){
-        const a = GameState.armies[i], b = GameState.armies[j];
-        if(a.factionId === b.factionId) continue;
-        const dist = Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2);
-        if(dist < 20) {
-          // Check if at war
-          if(this.areAtWar(a.factionId, b.factionId)) {
-            this.battle(a,b);
-          }
-        }
-      }
-    }
-    // Army vs Bandit
-    GameState.armies.forEach(army => {
-      GameState.bandits.forEach(bandit => {
-        const dist = Math.sqrt((army.x-bandit.x)**2+(army.y-bandit.y)**2);
-        if(dist < 20) {
-          this.battleBandit(army, bandit);
-        }
-      });
-    });
-    // Remove dead
-    GameState.armies = GameState.armies.filter(a=>a.troops>0);
-    GameState.bandits = GameState.bandits.filter(b=>b.troops>0);
-  },
-
-  battle(a, b) {
-    const atkBonus = this.getTechEffect('army_atk')||0;
-    const aPower = a.troops * ((a.atk||5)+atkBonus);
-    const bPower = b.troops * ((b.atk||5)+atkBonus);
-    const total = aPower + bPower;
-    const aLoss = Math.floor(a.troops * (bPower/total) * (0.1+Math.random()*0.1));
-    const bLoss = Math.floor(b.troops * (aPower/total) * (0.1+Math.random()*0.1));
-    a.troops = Math.max(0, a.troops - aLoss);
-    b.troops = Math.max(0, b.troops - bLoss);
-    const fA = GameState.factions.find(f=>f.id===a.factionId);
-    const fB = GameState.factions.find(f=>f.id===b.factionId);
-    UI.notify(`${fA?.name||'?'} vs ${fB?.name||'?'}: 损失 ${aLoss}/${bLoss}`,'war');
-  },
-
-  battleBandit(army, bandit) {
-    const atkBonus = this.getTechEffect('army_atk')||0;
-    const aPower = army.troops * ((army.atk||5)+atkBonus);
-    const bPower = bandit.troops * (bandit.atk||3);
-    const total = aPower + bPower;
-    const aLoss = Math.floor(army.troops * (bPower/total) * 0.08);
-    const bLoss = Math.floor(bandit.troops * (aPower/total) * 0.15);
-    army.troops = Math.max(0, army.troops - aLoss);
-    bandit.troops = Math.max(0, bandit.troops - bLoss);
-    if(bandit.troops <= 0) {
-      UI.notify(`匪寇「${bandit.name}」被消灭！`,'peace');
-    }
-  },
-
-  siegeCity(army, city) {
-    const defBonus = (this.getTechEffect('city_def')||0) + (city.defense||10);
-    const siegeBonus = this.getTechEffect('siege')||0;
-    const armyPower = army.troops * ((army.atk||5) + siegeBonus);
-    const cityPower = (city.garrison||0) * 5 + defBonus * 10;
-    if(armyPower > cityPower) {
-      const oldFaction = GameState.factions.find(f=>f.id===city.factionId);
-      const newFaction = GameState.factions.find(f=>f.id===army.factionId);
-      city.factionId = army.factionId;
-      city.garrison = Math.floor(army.troops * 0.2);
-      army.troops = Math.floor(army.troops * 0.8);
-      UI.notify(`${newFaction?.name||'?'} 攻占了 ${city.name}！`,'war');
-    } else {
-      army.troops = Math.floor(army.troops * 0.7);
-      UI.notify(`攻城失败：${city.name} 防守成功`,'peace');
-    }
-  },
-
-  areAtWar(fid1, fid2) {
-    return GameState.wars.some(w =>
-      (w.attacker===fid1 && w.defender===fid2) ||
-      (w.attacker===fid2 && w.defender===fid1)
-    );
-  },
-
-  declareWar(fid1, fid2) {
-    if(this.areAtWar(fid1,fid2)) return;
-    GameState.wars.push({attacker:fid1, defender:fid2, startYear:GameState.time.year});
-    const f1 = GameState.factions.find(f=>f.id===fid1);
-    const f2 = GameState.factions.find(f=>f.id===fid2);
-    UI.notify(`${f1?.name||'?'} 对 ${f2?.name||'?'} 宣战！`,'war');
-  },
-
-  makePeace(fid1, fid2) {
-    GameState.wars = GameState.wars.filter(w =>
-      !((w.attacker===fid1&&w.defender===fid2)||(w.attacker===fid2&&w.defender===fid1))
-    );
-    const f1 = GameState.factions.find(f=>f.id===fid1);
-    const f2 = GameState.factions.find(f=>f.id===fid2);
-    UI.notify(`${f1?.name||'?'} 与 ${f2?.name||'?'} 达成和平`,'peace');
-  },
-
-  getTechEffect(key) {
-    let total = 0;
-    for(const era of GameState.techTree) {
-      for(const tech of era.techs) {
-        if(GameState.researchedTechs[tech.id] && tech.effects && tech.effects[key]) {
-          total += tech.effects[key];
-        }
-      }
-    }
-    return total;
-  },
-
-  getLawEffect(category, key) {
-    const law = GameState.laws[category];
-    if(!law) return 0;
-    const effects = LAW_EFFECTS[category];
-    if(!effects || !effects[law.current]) return 0;
-    return effects[law.current][key] || 0;
-  },
-
-  findTech(id) {
-    for(const era of GameState.techTree) {
-      for(const tech of era.techs) {
-        if(tech.id === id) return tech;
-      }
-    }
-    return null;
-  },
-
-  recruitArmy(cityId, unitId, count) {
-    const city = GameState.cities.find(c=>c.id===cityId);
-    const unit = GameState.units.find(u=>u.id===unitId);
-    const faction = GameState.factions.find(f=>f.id===city.factionId);
-    if(!city||!unit||!faction) return;
-    const costMult = this.getLawEffect('military','recruit_cost') || 1;
-    const totalCost = unit.cost * count * costMult;
-    if(faction.gold < totalCost) { UI.notify('金币不足！','war'); return; }
-    faction.gold -= totalCost;
-    // Create or merge army
-    let existingArmy = GameState.armies.find(a=>a.factionId===faction.id && Math.abs(a.x-city.x)<10 && Math.abs(a.y-city.y)<10);
-    if(existingArmy) {
-      existingArmy.troops += count;
-      existingArmy.upkeep += unit.upkeep * count;
-    } else {
-      GameState.armies.push({
-        id:uid(),
-        name:unit.name+'部队',
-        factionId:faction.id,
-        type:unit.type,
-        x:city.x,
-        y:city.y,
-        troops:count,
-        atk:unit.atk,
-        def:unit.def,
-        upkeep:unit.upkeep*count,
-        targetX:null,targetY:null,targetCityId:null,
-      });
-    }
-    UI.notify(`在 ${city.name} 招募了 ${count} 名 ${unit.name}`,'peace');
-  },
-
-  startResearch(techId) {
-    const tech = this.findTech(techId);
-    if(!tech) return;
-    if(GameState.researchedTechs[techId]) return;
-    if(tech.requires && !tech.requires.every(r=>GameState.researchedTechs[r])) {
-      UI.notify('前置科技未完成！','war');
-      return;
-    }
-    GameState.currentResearch = techId;
-    GameState.researchProgress = 0;
-    UI.notify(`开始研究「${tech.name}」`);
-  },
-
-  updateTopbar() {
-    const faction = GameState.factions.find(f=>f.id===GameState.playerFaction);
-    if(!faction) return;
-    $('playerFactionName').textContent = faction.name;
-    $('statGold').textContent = fmtNum(faction.gold||0);
-    $('statPop').textContent = fmtNum(faction.totalPop||0);
-    const armyCount = GameState.armies.filter(a=>a.factionId===faction.id).reduce((s,a)=>s+a.troops,0);
-    $('statArmy').textContent = fmtNum(armyCount);
-    const techCount = Object.keys(GameState.researchedTechs).length;
-    $('statTech').textContent = techCount;
-  },
-
-  saveGame() {
-    const name = prompt('存档名称：', `存档_${GameState.time.year}年`);
-    if(!name) return;
-    const saveData = JSON.parse(JSON.stringify(GameState));
-    saveData._saveName = name;
-    saveData._saveDate = new Date().toLocaleString();
-    Storage.save('save_'+uid(), saveData);
-    UI.notify('游戏已保存！','peace');
-  },
-
-  loadGame(key) {
-    const data = Storage.load(key);
-    if(!data) { UI.notify('读取失败！','war'); return; }
-    Object.assign(GameState, data);
-    GameState.playing = true;
-    $('mainMenu').style.display = 'none';
-    $('gameUI').classList.add('active');
-    MapCtrl.loadMap(GameState.mapImage || DEFAULT_MAP_SRC);
-    this.setSpeed(GameState.speed || 1);
-    setTimeout(()=>MapCtrl.renderEntities(), 500);
-    UI.notify('存档已读取','peace');
-  },
-
-  initNewGame(scenario) {
-    // Reset state
-    GameState.playing = true;
-    GameState.time = {year:scenario.startYear||1,month:1,day:1};
-    GameState.factions = JSON.parse(JSON.stringify(scenario.factions||[]));
-    GameState.cities = JSON.parse(JSON.stringify(scenario.cities||[]));
-    GameState.armies = JSON.parse(JSON.stringify(scenario.armies||[]));
-    GameState.bandits = JSON.parse(JSON.stringify(scenario.bandits||[]));
-    GameState.techTree = JSON.parse(JSON.stringify(scenario.techTree||DEFAULT_TECH_TREE));
-    GameState.cultures = JSON.parse(JSON.stringify(scenario.cultures||DEFAULT_CULTURES));
-    GameState.units = JSON.parse(JSON.stringify(scenario.units||DEFAULT_UNITS));
-    GameState.characters = JSON.parse(JSON.stringify(scenario.characters||DEFAULT_CHARACTERS));
-    GameState.laws = JSON.parse(JSON.stringify(scenario.laws||DEFAULT_LAWS));
-    GameState.researchedTechs = {};
-    GameState.currentResearch = null;
-    GameState.researchProgress = 0;
-    GameState.wars = [];
-    GameState.playerFaction = scenario.playerFaction || (scenario.factions[0]?.id);
-    GameState.playerMode = scenario.playerMode || 'nation';
-    GameState.mapImage = scenario.mapImage || DEFAULT_MAP_SRC;
-
-    // Give each faction starting gold
-    GameState.factions.forEach(f => {
-      f.gold = f.gold || 1000;
-      f.totalPop = 0;
-    });
-
-    $('mainMenu').style.display = 'none';
-    $('gameUI').classList.add('active');
-    MapCtrl.loadMap(GameState.mapImage);
-    this.setSpeed(1);
-    setTimeout(()=>{ MapCtrl.renderEntities(); this.updateTopbar(); }, 500);
-  },
-};
-
-// ============================================================
-// AI SYSTEM
-// ============================================================
-const AI = {
-  tick() {
-    GameState.factions.forEach(faction => {
-      if(faction.id === GameState.playerFaction) return;
-      this.factionAI(faction);
-    });
-  },
-
-  factionAI(faction) {
-    const fCities = GameState.cities.filter(c=>c.factionId===faction.id);
-    const fArmies = GameState.armies.filter(a=>a.factionId===faction.id);
-    const totalTroops = fArmies.reduce((s,a)=>s+a.troops,0);
-
-    // Recruit if gold available and few troops
-    if(faction.gold > 500 && totalTroops < (faction.totalPop||100)*0.1 && fCities.length>0) {
-      const city = pick(fCities);
-      const unit = pick(GameState.units.filter(u=>u.type==='land'));
-      if(unit) {
-        const count = Math.min(Math.floor(faction.gold / unit.cost / 2), 100);
-        if(count > 5) {
-          faction.gold -= unit.cost * count;
-          GameState.armies.push({
-            id:uid(),
-            name:unit.name+'部队',
-            factionId:faction.id,
-            type:'land',
-            x:city.x+randInt(-5,5), y:city.y+randInt(-5,5),
-            troops:count,
-            atk:unit.atk, def:unit.def,
-            upkeep:unit.upkeep*count,
-          });
-        }
-      }
-    }
-
-    // Consider war
-    if(fArmies.length > 0 && Math.random() < 0.02) {
-      const otherFactions = GameState.factions.filter(f=>f.id!==faction.id);
-      const target = pick(otherFactions);
-      if(target && !Game.areAtWar(faction.id, target.id)) {
-        const myPower = totalTroops;
-        const theirPower = GameState.armies.filter(a=>a.factionId===target.id).reduce((s,a)=>s+a.troops,0);
-        if(myPower > theirPower * 1.5) {
-          Game.declareWar(faction.id, target.id);
-        }
-      }
-    }
-
-    // Move armies toward enemy cities if at war
-    GameState.wars.forEach(war => {
-      let enemyId = null;
-      if(war.attacker === faction.id) enemyId = war.defender;
-      if(war.defender === faction.id) enemyId = war.attacker;
-      if(!enemyId) return;
-      const enemyCities = GameState.cities.filter(c=>c.factionId===enemyId);
-      if(enemyCities.length === 0) return;
-      fArmies.forEach(army => {
-        if(!army.targetX) {
-          const target = pick(enemyCities);
-          army.targetX = target.x;
-          army.targetY = target.y;
-          army.targetCityId = target.id;
-        }
-      });
-    });
-
-    // Consider peace if losing
-    GameState.wars.forEach(war => {
-      let enemyId = null;
-      if(war.attacker === faction.id) enemyId = war.defender;
-      if(war.defender === faction.id) enemyId = war.attacker;
-      if(!enemyId) return;
-      if(fCities.length <= 1 && Math.random() < 0.1) {
-        Game.makePeace(faction.id, enemyId);
-      }
-    });
-
-    // Attack nearby bandits
-    fArmies.forEach(army => {
-      if(army.targetX) return;
-      const nearBandit = GameState.bandits.find(b => Math.sqrt((b.x-army.x)**2+(b.y-army.y)**2) < 100);
-      if(nearBandit && army.troops > nearBandit.troops * 1.5) {
-        army.targetX = nearBandit.x;
-        army.targetY = nearBandit.y;
-      }
-    });
-  }
-};
-
-// ============================================================
-// UI SYSTEM
-// ============================================================
-const UI = {
-  currentPanel: null,
-
-  // Modal
-  openModal(title, bodyHTML, footerHTML, wide) {
-    $('modalTitle').textContent = title;
-    $('modalBody').innerHTML = bodyHTML;
-    $('modalFooter').innerHTML = footerHTML || '';
-    $('modalContent').classList.toggle('modal-wide', !!wide);
-    $('modalOverlay').classList.add('active');
-  },
-  closeModal() {
-    $('modalOverlay').classList.remove('active');
-  },
-
-  // Notifications
-  notify(msg, type='') {
-    const el = document.createElement('div');
-    el.className = 'notification ' + type;
-    el.textContent = msg;
-    $('notifications').appendChild(el);
-    setTimeout(()=>el.remove(), 5000);
-  },
-
-  // Panel
-  togglePanel(name) {
-    if(this.currentPanel === name) { this.closePanel(); return; }
-    this.currentPanel = name;
-    const panel = $('sidePanel');
-    panel.classList.add('open');
-    switch(name) {
-      case 'city': this.renderCityListPanel(); break;
-      case 'army': this.renderArmyPanel(); break;
-      case 'tech': this.renderTechPanel(); break;
-      case 'diplomacy': this.renderDiplomacyPanel(); break;
-      case 'law': this.renderLawPanel(); break;
-      case 'faction': this.renderFactionPanel(); break;
-    }
-  },
-  closePanel() {
-    this.currentPanel = null;
-    $('sidePanel').classList.remove('open');
-  },
-
-  // ===== CITY LIST PANEL =====
-  renderCityListPanel() {
-    $('panelTitle').textContent = '城池管理';
-    const myCities = GameState.cities.filter(c=>c.factionId===GameState.playerFaction);
-    let html = '';
-    myCities.forEach(city => {
-      html += `<div class="list-item" onclick="UI.openCityPanel('${city.id}')">
-        <div class="list-item-info">
-          <div class="list-item-name">${city.name}</div>
-          <div class="list-item-desc">人口:${fmtNum(city.population)} 经济:Lv${city.economyLevel} 防御:${city.defense}</div>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();UI.editCity('${city.id}')">编辑</button>
-        </div>
-      </div>`;
-    });
-    if(!myCities.length) html = '<div class="empty-state">暂无城池</div>';
-    $('panelBody').innerHTML = html;
-  },
-
-  openCityPanel(cityId) {
-    const city = GameState.cities.find(c=>c.id===cityId);
-    if(!city) return;
-    $('panelTitle').textContent = city.name;
-    $('sidePanel').classList.add('open');
-    this.currentPanel = 'cityDetail';
-    const faction = GameState.factions.find(f=>f.id===city.factionId);
-    const culture = GameState.cultures.find(c=>c.id===city.cultureId);
-    const isMine = city.factionId === GameState.playerFaction;
-
-    let html = `
-      <div class="panel-section">
-        <div class="panel-section-title">基本信息</div>
-        <div class="stat-row"><span class="label">所属</span><span class="value">${faction?.name||'无'}</span></div>
-        <div class="stat-row"><span class="label">民族</span><span class="value">${culture?.name||'无'}</span></div>
-        <div class="stat-row"><span class="label">人口</span><span class="value">${fmtNum(city.population)}</span></div>
-        <div class="stat-row"><span class="label">经济等级</span><span class="value">Lv ${city.economyLevel}</span></div>
-        <div class="stat-row"><span class="label">防御系数</span><span class="value">${city.defense}</span></div>
-        <div class="stat-row"><span class="label">驻军</span><span class="value">${fmtNum(city.garrison||0)}</span></div>
-        <div class="stat-row"><span class="label">类型</span><span class="value">${city.type||'普通城池'}</span></div>
-        ${city.tags?`<div class="stat-row"><span class="label">标签</span><span class="value">${city.tags.map(t=>'<span class="tag">'+t+'</span>').join(' ')}</span></div>`:''}
-      </div>`;
-
-    if(isMine) {
-      html += `
-      <div class="panel-section">
-        <div class="panel-section-title">招募军队</div>
-        <div style="display:flex;flex-direction:column;gap:0.4rem;">`;
-      
-      const availableUnits = GameState.units.filter(u => {
-        if(u.type==='air' && !Game.getTechEffect('can_air')) return false;
-        if(u.type==='naval' && !Game.getTechEffect('can_naval')) return false;
-        return u.culture==='通用' || u.culture===culture?.name;
-      });
-      availableUnits.forEach(unit => {
-        html += `<div class="list-item">
-          <div class="list-item-info">
-            <div class="list-item-name">${unit.name} <span class="tag">${unit.type==='land'?'陆':'naval'?'海':'空'}</span></div>
-            <div class="list-item-desc">攻${unit.atk} 防${unit.def} 费用${unit.cost}/人</div>
-          </div>
-          <div class="list-item-actions">
-            <button class="btn btn-sm btn-primary" onclick="Game.recruitArmy('${city.id}','${unit.id}',10)">+10</button>
-            <button class="btn btn-sm btn-primary" onclick="Game.recruitArmy('${city.id}','${unit.id}',50)">+50</button>
-          </div>
-        </div>`;
-      });
-      html += '</div></div>';
-    }
-    $('panelBody').innerHTML = html;
-  },
-
-  editCity(cityId) {
-    const city = GameState.cities.find(c=>c.id===cityId);
-    if(!city) return;
-    const html = `
-      <div class="form-row"><label class="form-label">城池名称</label><input class="form-input" id="ecName" value="${city.name}"></div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">人口</label><input type="number" class="form-input" id="ecPop" value="${city.population}"></div>
-        <div class="form-row"><label class="form-label">经济等级</label><input type="number" class="form-input" id="ecEcon" value="${city.economyLevel}" min="1" max="100"></div>
-      </div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">防御系数</label><input type="number" class="form-input" id="ecDef" value="${city.defense}" min="0"></div>
-        <div class="form-row"><label class="form-label">驻军</label><input type="number" class="form-input" id="ecGarrison" value="${city.garrison||0}" min="0"></div>
-      </div>
-      <div class="form-row"><label class="form-label">城池类型</label><input class="form-input" id="ecType" value="${city.type||''}" placeholder="如：要塞、港口、商业中心"></div>
-      <div class="form-row"><label class="form-label">自定义标签（逗号分隔）</label><input class="form-input" id="ecTags" value="${(city.tags||[]).join(',')}"></div>
-      <div class="form-row"><label class="form-label">民族文化</label>
-        <select class="form-select" id="ecCulture">
-          <option value="">无</option>
-          ${GameState.cultures.map(c=>`<option value="${c.id}" ${c.id===city.cultureId?'selected':''}>${c.name}</option>`).join('')}
-        </select>
-      </div>
-    `;
-    const footer = `
-      <button class="btn btn-danger" onclick="GameState.cities=GameState.cities.filter(c=>c.id!=='${city.id}');UI.closeModal();MapCtrl.renderEntities();UI.renderCityListPanel();">删除城池</button>
-      <button class="btn btn-secondary" onclick="UI.closeModal()">取消</button>
-      <button class="btn btn-primary" onclick="UI.saveCityEdit('${city.id}')">保存</button>
-    `;
-    this.openModal('编辑城池', html, footer);
-  },
-
-  saveCityEdit(cityId) {
-    const city = GameState.cities.find(c=>c.id===cityId);
-    if(!city) return;
-    city.name = $('ecName').value || city.name;
-    city.population = parseInt($('ecPop').value)||city.population;
-    city.economyLevel = clamp(parseInt($('ecEcon').value)||1,1,100);
-    city.defense = Math.max(0,parseInt($('ecDef').value)||0);
-    city.garrison = Math.max(0,parseInt($('ecGarrison').value)||0);
-    city.type = $('ecType').value;
-    city.tags = $('ecTags').value.split(',').map(s=>s.trim()).filter(Boolean);
-    city.cultureId = $('ecCulture').value;
-    this.closeModal();
-    MapCtrl.renderEntities();
-    if(this.currentPanel==='cityDetail') this.openCityPanel(cityId);
-  },
-
-  // ===== ARMY PANEL =====
-  renderArmyPanel() {
-    $('panelTitle').textContent = '军事';
-    const myArmies = GameState.armies.filter(a=>a.factionId===GameState.playerFaction);
-    let html = '';
-    myArmies.forEach(army => {
-      html += `<div class="list-item">
-        <div class="list-item-info">
-          <div class="list-item-name">${army.name} <span class="tag">${army.type==='land'?'陆军':army.type==='naval'?'海军':'空军'}</span></div>
-          <div class="list-item-desc">兵力:${fmtNum(army.troops)} 攻:${army.atk} 防:${army.def}</div>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn btn-sm btn-secondary" onclick="UI.selectArmyTarget('${army.id}')" title="移动">📍</button>
-          <button class="btn btn-sm btn-danger" onclick="UI.disbandArmy('${army.id}')" title="解散">✕</button>
-        </div>
-      </div>`;
-    });
-    if(!myArmies.length) html = '<div class="empty-state">暂无军队<br>在城池中招募</div>';
-    $('panelBody').innerHTML = html;
-  },
-
-  openArmyPanel(armyId) {
-    const army = GameState.armies.find(a=>a.id===armyId);
-    if(!army) return;
-    $('panelTitle').textContent = army.name;
-    $('sidePanel').classList.add('open');
-    this.currentPanel = 'armyDetail';
-    const faction = GameState.factions.find(f=>f.id===army.factionId);
-    const isMine = army.factionId === GameState.playerFaction;
-
-    let html = `
-      <div class="panel-section">
-        <div class="panel-section-title">部队信息</div>
-        <div class="stat-row"><span class="label">所属</span><span class="value">${faction?.name||'无'}</span></div>
-        <div class="stat-row"><span class="label">兵种类型</span><span class="value">${army.type==='land'?'陆军':army.type==='naval'?'海军':'空军'}</span></div>
-        <div class="stat-row"><span class="label">兵力</span><span class="value">${fmtNum(army.troops)}</span></div>
-        <div class="stat-row"><span class="label">攻击力</span><span class="value">${army.atk}</span></div>
-        <div class="stat-row"><span class="label">防御力</span><span class="value">${army.def}</span></div>
-        <div class="stat-row"><span class="label">维护费</span><span class="value">${fmtNum(army.upkeep||0)}/月</span></div>
-      </div>`;
-    
-    if(isMine) {
-      html += `<div class="panel-section">
-        <button class="btn btn-secondary" onclick="UI.selectArmyTarget('${army.id}')" style="width:100%;margin-bottom:0.4rem;">📍 指定目标</button>
-        <button class="btn btn-secondary" onclick="UI.armyAttackCity('${army.id}')" style="width:100%;margin-bottom:0.4rem;">⚔ 攻击城池</button>
-        <button class="btn btn-danger" onclick="UI.disbandArmy('${army.id}')" style="width:100%;">解散部队</button>
-      </div>`;
-    }
-    $('panelBody').innerHTML = html;
-  },
-
-  selectArmyTarget(armyId) {
-    UI.notify('在地图上右键点击目标位置');
-    window._pendingArmyMove = armyId;
-  },
-
-  armyAttackCity(armyId) {
-    const army = GameState.armies.find(a=>a.id===armyId);
-    if(!army) return;
-    const enemyCities = GameState.cities.filter(c=>c.factionId!==army.factionId);
-    let html = '<div class="search-bar"><input class="form-input" placeholder="搜索城池..." oninput="UI.filterList(this,\'atkCityList\')"></div>';
-    html += '<div id="atkCityList">';
-    enemyCities.forEach(c=>{
-      html += `<div class="list-item" data-search="${c.name}" onclick="UI.sendArmyToCity('${armyId}','${c.id}')">
-        <div class="list-item-info"><div class="list-item-name">${c.name}</div>
-        <div class="list-item-desc">防御:${c.defense} 驻军:${c.garrison||0}</div></div>
-      </div>`;
-    });
-    html += '</div>';
-    this.openModal('选择攻击目标', html, '<button class="btn btn-secondary" onclick="UI.closeModal()">取消</button>');
-  },
-
-  sendArmyToCity(armyId, cityId) {
-    const army = GameState.armies.find(a=>a.id===armyId);
-    const city = GameState.cities.find(c=>c.id===cityId);
-    if(!army||!city) return;
-    // Auto declare war
-    if(!Game.areAtWar(army.factionId, city.factionId)) {
-      Game.declareWar(army.factionId, city.factionId);
-    }
-    army.targetX = city.x;
-    army.targetY = city.y;
-    army.targetCityId = city.id;
-    this.closeModal();
-    UI.notify(`部队已出发前往 ${city.name}`);
-  },
-
-  disbandArmy(armyId) {
-    if(!confirm('确定解散该部队？')) return;
-    GameState.armies = GameState.armies.filter(a=>a.id!==armyId);
-    MapCtrl.renderEntities();
-    if(this.currentPanel==='army') this.renderArmyPanel();
-    this.closePanel();
-  },
-
-  // ===== TECH PANEL =====
-  renderTechPanel() {
-    $('panelTitle').textContent = '科技';
-    let html = '';
-    if(GameState.currentResearch) {
-      const tech = Game.findTech(GameState.currentResearch);
-      if(tech) {
-        const pct = Math.min(100, (GameState.researchProgress/tech.cost)*100);
-        html += `<div class="panel-section">
-          <div class="panel-section-title">正在研究</div>
-          <div style="font-weight:700;margin-bottom:0.3rem;">${tech.name}</div>
-          <div style="background:var(--bg-secondary);height:6px;border-radius:3px;overflow:hidden;">
-            <div style="height:100%;width:${pct}%;background:var(--accent-blue);transition:width 0.3s;"></div>
-          </div>
-          <div style="font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;">${Math.floor(GameState.researchProgress)}/${tech.cost}</div>
-        </div>`;
-      }
-    }
-
-    GameState.techTree.forEach(era => {
-      html += `<div class="tech-era"><div class="tech-era-label">${era.era}</div><div class="tech-nodes">`;
-      era.techs.forEach(tech => {
-        const researched = GameState.researchedTechs[tech.id];
-        const isResearching = GameState.currentResearch === tech.id;
-        const canResearch = !researched && !tech.requires?.some(r=>!GameState.researchedTechs[r]);
-        const cls = researched ? 'researched' : isResearching ? 'researching' : canResearch ? '' : 'locked';
-        html += `<div class="tech-node ${cls}" onclick="${canResearch&&!researched?`Game.startResearch('${tech.id}');UI.renderTechPanel()`:''}" title="${tech.desc||''}">
-          <div class="tech-node-name">${tech.name}</div>
-          <div class="tech-node-cost">${researched?'✓ 已完成':'费用:'+tech.cost}</div>
-          ${isResearching?`<div class="tech-progress" style="width:${Math.min(100,(GameState.researchProgress/tech.cost)*100)}%"></div>`:''}
-        </div>`;
-      });
-      html += '</div></div>';
-    });
-    $('panelBody').innerHTML = html;
-  },
-
-  // ===== DIPLOMACY PANEL =====
-  renderDiplomacyPanel() {
-    $('panelTitle').textContent = '外交';
-    let html = '';
-    GameState.factions.forEach(f => {
-      if(f.id === GameState.playerFaction) return;
-      const atWar = Game.areAtWar(GameState.playerFaction, f.id);
-      html += `<div class="list-item">
-        <div class="list-item-info">
-          <div class="list-item-name"><span style="display:inline-block;width:12px;height:12px;background:${f.color};border-radius:2px;vertical-align:middle;margin-right:6px;"></span>${f.name}</div>
-          <div class="list-item-desc">城池:${GameState.cities.filter(c=>c.factionId===f.id).length} 军队:${fmtNum(GameState.armies.filter(a=>a.factionId===f.id).reduce((s,a)=>s+a.troops,0))}</div>
-        </div>
-        <div class="list-item-actions">
-          ${atWar?
-            `<span class="tag" style="border-color:var(--accent-red);color:var(--accent-red);">交战中</span>
-            <button class="btn btn-sm btn-secondary" onclick="Game.makePeace('${GameState.playerFaction}','${f.id}');UI.renderDiplomacyPanel();">求和</button>`
-            :
-            `<span class="tag" style="border-color:var(--accent-green);color:var(--accent-green);">和平</span>
-            <button class="btn btn-sm btn-danger" onclick="Game.declareWar('${GameState.playerFaction}','${f.id}');UI.renderDiplomacyPanel();">宣战</button>`
-          }
-        </div>
-      </div>`;
-    });
-    if(GameState.factions.length <= 1) html = '<div class="empty-state">暂无其他势力</div>';
-    $('panelBody').innerHTML = html;
-  },
-
-  // ===== LAW PANEL =====
-  renderLawPanel() {
-    $('panelTitle').textContent = '法律';
-    let html = '';
-    for(const [key, law] of Object.entries(GameState.laws)) {
-      html += `<div class="law-category">
-        <div class="law-category-title">${law.name}</div>
-        <div class="law-options">`;
-      law.options.forEach(opt => {
-        html += `<div class="law-option ${opt===law.current?'active':''}" onclick="GameState.laws['${key}'].current='${opt}';UI.renderLawPanel();">${opt}</div>`;
-      });
-      html += '</div></div>';
-    }
-    $('panelBody').innerHTML = html;
-  },
-
-  // ===== FACTION PANEL =====
-  renderFactionPanel() {
-    $('panelTitle').textContent = '派系';
-    const faction = GameState.factions.find(f=>f.id===GameState.playerFaction);
-    if(!faction) { $('panelBody').innerHTML = '<div class="empty-state">无派系</div>'; return; }
-    
-    let html = `
-      <div class="panel-section">
-        <div class="panel-section-title">我的派系</div>
-        <div class="stat-row"><span class="label">名称</span><span class="value">${faction.name}</span></div>
-        <div class="stat-row"><span class="label">金币</span><span class="value">${fmtNum(faction.gold||0)}</span></div>
-        <div class="stat-row"><span class="label">总人口</span><span class="value">${fmtNum(faction.totalPop||0)}</span></div>
-        <div class="stat-row"><span class="label">旗帜</span><span class="value">
-          <div class="flag-preview">${(faction.flagColors||['#c9a84c','#b44040','#0a0e17']).map(c=>`<div class="flag-stripe" style="background:${c}"></div>`).join('')}</div>
-        </span></div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">重要人物</div>`;
-    
-    const fChars = GameState.characters.filter(ch=>ch.factionId===faction.id);
-    fChars.forEach(ch => {
-      html += `<div class="list-item">
-        <div class="list-item-info">
-          <div class="list-item-name">${ch.name} ${ch.role?'<span class="tag tag-gold">'+ch.role+'</span>':''}</div>
-          <div class="list-item-desc">统率:${ch.skills?.command||0} 政治:${ch.skills?.admin||0} 外交:${ch.skills?.diplomacy||0}</div>
-        </div>
-      </div>`;
-    });
-    if(!fChars.length) html += '<div class="empty-state">暂无人物</div>';
-    
-    html += `</div>
-      <div class="panel-section">
-        <div class="panel-section-title">职权结构</div>`;
-    
-    if(faction.hierarchy && faction.hierarchy.length) {
-      html += this.renderHierarchy(faction.hierarchy);
-    } else {
-      html += '<div class="empty-state">未设置职权结构</div>';
-    }
-    html += '</div>';
-    
-    $('panelBody').innerHTML = html;
-  },
-
-  renderHierarchy(nodes, depth=0) {
-    let html = '<div class="hierarchy-tree">';
-    nodes.forEach(node => {
-      html += `<div class="hierarchy-node" style="margin-left:${depth*1.5}rem;">
-        <span class="hierarchy-handle">☰</span>
-        <span>${node.title}: ${node.holder||'空缺'}</span>
-      </div>`;
-      if(node.children && node.children.length) {
-        html += this.renderHierarchy(node.children, depth+1);
-      }
-    });
-    html += '</div>';
-    return html;
-  },
-
-  // ===== MAP CONTEXT MENU =====
-  showMapContextMenu(sx, sy, mx, my) {
-    const menu = $('contextMenu');
-    let items = '';
-    
-    if(window._pendingArmyMove) {
-      const armyId = window._pendingArmyMove;
-      items += `<div class="context-menu-item" onclick="UI.moveArmyTo('${armyId}',${mx},${my})">📍 移动部队到此处</div>`;
-      window._pendingArmyMove = null;
-    }
-    
-    items += `<div class="context-menu-item" onclick="UI.addCityAt(${mx},${my})">🏰 放置城池</div>`;
-    items += `<div class="context-menu-item" onclick="UI.addBanditAt(${mx},${my})">💀 放置匪寇</div>`;
-    items += `<div class="context-menu-sep"></div>`;
-    items += `<div class="context-menu-item" onclick="UI.hideContextMenu()">取消</div>`;
-    
-    menu.innerHTML = items;
-    menu.style.left = sx + 'px';
-    menu.style.top = sy + 'px';
-    menu.classList.add('visible');
-    
-    const hideHandler = () => { menu.classList.remove('visible'); document.removeEventListener('click',hideHandler); };
-    setTimeout(()=>document.addEventListener('click',hideHandler),10);
-  },
-  hideContextMenu() { $('contextMenu').classList.remove('visible'); },
-
-  moveArmyTo(armyId, mx, my) {
-    const army = GameState.armies.find(a=>a.id===armyId);
-    if(army) { army.targetX=mx; army.targetY=my; army.targetCityId=null; }
-    this.hideContextMenu();
-  },
-
-  addCityAt(mx, my) {
-    this.hideContextMenu();
-    const html = `
-      <div class="form-row"><label class="form-label">城池名称</label><input class="form-input" id="ncName" value="新城池"></div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">人口</label><input type="number" class="form-input" id="ncPop" value="1000"></div>
-        <div class="form-row"><label class="form-label">经济等级</label><input type="number" class="form-input" id="ncEcon" value="1" min="1" max="100"></div>
-      </div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">防御系数</label><input type="number" class="form-input" id="ncDef" value="10"></div>
-        <div class="form-row"><label class="form-label">驻军</label><input type="number" class="form-input" id="ncGarrison" value="50"></div>
-      </div>
-      <div class="form-row"><label class="form-label">城池类型</label><input class="form-input" id="ncType" placeholder="如：要塞、港口、商业中心"></div>
-      <div class="form-row"><label class="form-label">自定义标签（逗号分隔）</label><input class="form-input" id="ncTags"></div>
-      <div class="form-row"><label class="form-label">所属派系</label>
-        <select class="form-select" id="ncFaction">
-          ${GameState.factions.map(f=>`<option value="${f.id}">${f.name}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-row"><label class="form-label">民族文化</label>
-        <select class="form-select" id="ncCulture">
-          <option value="">无</option>
-          ${GameState.cultures.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
-        </select>
-      </div>
-    `;
-    const footer = `
-      <button class="btn btn-secondary" onclick="UI.closeModal()">取消</button>
-      <button class="btn btn-primary" onclick="UI.confirmAddCity(${mx},${my})">确定</button>
-    `;
-    this.openModal('放置城池', html, footer);
-  },
-
-  confirmAddCity(mx, my) {
-    const city = {
-      id: uid(),
-      name: $('ncName').value || '新城池',
-      x: mx, y: my,
-      population: parseInt($('ncPop').value)||1000,
-      economyLevel: clamp(parseInt($('ncEcon').value)||1,1,100),
-      defense: Math.max(0,parseInt($('ncDef').value)||10),
-      garrison: Math.max(0,parseInt($('ncGarrison').value)||50),
-      type: $('ncType').value,
-      tags: $('ncTags').value.split(',').map(s=>s.trim()).filter(Boolean),
-      factionId: $('ncFaction').value,
-      cultureId: $('ncCulture').value,
-    };
-    GameState.cities.push(city);
-    this.closeModal();
-    MapCtrl.renderEntities();
-  },
-
-  addBanditAt(mx, my) {
-    this.hideContextMenu();
-    const name = prompt('匪寇名称：','流寇');
-    if(!name) return;
-    GameState.bandits.push({
-      id:uid(), name,
-      x:mx, y:my,
-      troops:randInt(20,200),
-      atk:randInt(3,8), def:randInt(2,6),
-    });
-    MapCtrl.renderEntities();
-  },
-
-  showBanditInfo(bandit) {
-    $('panelTitle').textContent = '匪寇：'+bandit.name;
-    $('sidePanel').classList.add('open');
-    this.currentPanel = 'bandit';
-    $('panelBody').innerHTML = `
-      <div class="panel-section">
-        <div class="stat-row"><span class="label">兵力</span><span class="value">${fmtNum(bandit.troops)}</span></div>
-        <div class="stat-row"><span class="label">攻击</span><span class="value">${bandit.atk}</span></div>
-        <div class="stat-row"><span class="label">防御</span><span class="value">${bandit.def}</span></div>
-      </div>
-    `;
-  },
-
-  // ===== SEARCH HELPER =====
-  filterList(input, containerId) {
-    const val = input.value.toLowerCase();
-    document.querySelectorAll('#'+containerId+' .list-item').forEach(el => {
-      const search = el.dataset.search?.toLowerCase()||el.textContent.toLowerCase();
-      el.style.display = search.includes(val) ? '' : 'none';
-    });
-  },
-
-  // ===== MAIN MENU EDITORS =====
-  
-  // --- Scenario Editor ---
-  openScenarioEditor() {
-    const scenarios = Storage.load('scenarios') || [];
-    let html = `
-      <div class="search-bar">
-        <input class="form-input" placeholder="搜索剧本..." oninput="UI.filterList(this,'scenarioList')">
-        <button class="btn btn-primary" onclick="UI.createNewScenario()">新建剧本</button>
-      </div>
-      <div id="scenarioList">`;
-    
-    // Default scenario
-    html += `<div class="list-item" data-search="默认剧本">
-      <div class="list-item-info">
-        <div class="list-item-name">默认剧本</div>
-        <div class="list-item-desc">包含基础派系和设定的入门剧本</div>
-      </div>
-      <div class="list-item-actions">
-        <button class="btn btn-sm btn-primary" onclick="UI.loadDefaultScenario()">使用</button>
-      </div>
-    </div>`;
-    
-    scenarios.forEach((s,i) => {
-      html += `<div class="list-item" data-search="${s.name}">
-        <div class="list-item-info">
-          <div class="list-item-name">${s.name}</div>
-          <div class="list-item-desc">${s.factions?.length||0}个派系 ${s.cities?.length||0}个城池</div>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn btn-sm btn-primary" onclick="UI.useScenario(${i})">使用</button>
-          <button class="btn btn-sm btn-secondary" onclick="UI.editScenario(${i})">编辑</button>
-          <button class="btn btn-sm btn-danger" onclick="UI.deleteScenario(${i})">删除</button>
-        </div>
-      </div>`;
-    });
-    html += '</div>';
-    this.openModal('剧本管理', html, '', true);
-  },
-
-  loadDefaultScenario() {
-    this.closeModal();
-    this.openScenarioSetup({
-      name:'默认剧本',
-      startYear:1,
-      mapImage: DEFAULT_MAP_SRC,
-      factions:[
-        {id:'f1',name:'华夏',color:'#c9a84c',flagColors:['#c9a84c','#b44040','#0a0e17'],gold:2000,capitalId:'city1'},
-        {id:'f2',name:'草原汗国',color:'#4a8c5c',flagColors:['#4a8c5c','#2d5a3a','#1a3520'],gold:1500,capitalId:'city3'},
-        {id:'f3',name:'罗马帝国',color:'#7c5cbf',flagColors:['#7c5cbf','#c9a84c','#3b2070'],gold:1800,capitalId:'city5'},
-      ],
-      cities:[
-        {id:'city1',name:'长安',x:920,y:230,population:50000,economyLevel:5,defense:30,garrison:500,factionId:'f1',cultureId:'c_han',type:'都城',tags:['帝都']},
-        {id:'city2',name:'洛阳',x:950,y:250,population:30000,economyLevel:4,defense:20,garrison:300,factionId:'f1',cultureId:'c_han',type:'重镇'},
-        {id:'city3',name:'斡难河',x:960,y:160,population:15000,economyLevel:2,defense:10,garrison:800,factionId:'f2',cultureId:'c_nomad',type:'王庭'},
-        {id:'city4',name:'和林',x:940,y:180,population:10000,economyLevel:2,defense:8,garrison:400,factionId:'f2',cultureId:'c_nomad'},
-        {id:'city5',name:'罗马',x:510,y:210,population:40000,economyLevel:5,defense:35,garrison:600,factionId:'f3',cultureId:'c_roman',type:'都城',tags:['永恒之城']},
-        {id:'city6',name:'君士坦丁堡',x:570,y:210,population:25000,economyLevel:4,defense:40,garrison:400,factionId:'f3',cultureId:'c_roman'},
-      ],
-      armies:[],
-      bandits:[
-        {id:'b1',name:'黄巾余党',x:980,y:260,troops:200,atk:4,def:3},
-        {id:'b2',name:'北海盗匪',x:500,y:140,troops:150,atk:5,def:2},
-      ],
-      techTree: JSON.parse(JSON.stringify(DEFAULT_TECH_TREE)),
-      cultures: JSON.parse(JSON.stringify(DEFAULT_CULTURES)),
-      units: JSON.parse(JSON.stringify(DEFAULT_UNITS)),
-      characters: [
-        {id:'ch_1',name:'始皇大帝',culture:'汉族',factionId:'f1',role:'君主',skills:{command:90,admin:85,diplomacy:60},desc:'千古一帝'},
-        {id:'ch_2',name:'铁木真',culture:'游牧民族',factionId:'f2',role:'大汗',skills:{command:95,admin:70,diplomacy:50},desc:'一代天骄'},
-        {id:'ch_3',name:'凯撒',culture:'罗马人',factionId:'f3',role:'执政官',skills:{command:88,admin:80,diplomacy:75},desc:'罗马的征服者'},
-      ],
-      laws: JSON.parse(JSON.stringify(DEFAULT_LAWS)),
-    });
-  },
-
-  openScenarioSetup(scenario) {
-    // Choose faction & mode
-    let html = `<h3 style="margin-bottom:1rem;color:var(--accent-gold);">${scenario.name}</h3>
-      <div class="form-row"><label class="form-label">选择你的派系</label>
-        <select class="form-select" id="setupFaction">
-          ${scenario.factions.map(f=>`<option value="${f.id}">${f.name}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-row"><label class="form-label">游玩模式</label>
-        <select class="form-select" id="setupMode">
-          <option value="nation">国家模式（操控整个派系）</option>
-          <option value="character">人物模式（骑砍风格）</option>
-        </select>
-      </div>`;
-    const footer = `
-      <button class="btn btn-secondary" onclick="UI.closeModal()">返回</button>
-      <button class="btn btn-primary" onclick="UI.launchScenario()">开始游戏</button>
-    `;
-    this._pendingScenario = scenario;
-    this.openModal('选择派系', html, footer);
-  },
-
-  launchScenario() {
-    const scenario = this._pendingScenario;
-    if(!scenario) return;
-    scenario.playerFaction = $('setupFaction').value;
-    scenario.playerMode = $('setupMode').value;
-    this.closeModal();
-    Game.initNewGame(scenario);
-  },
-
-  createNewScenario() {
-    this.closeModal();
-    const scenario = {
-      name:'新剧本',
-      startYear:1,
-      mapImage: DEFAULT_MAP_SRC,
-      factions:[],
-      cities:[],
-      armies:[],
-      bandits:[],
-      techTree: JSON.parse(JSON.stringify(DEFAULT_TECH_TREE)),
-      cultures: JSON.parse(JSON.stringify(DEFAULT_CULTURES)),
-      units: JSON.parse(JSON.stringify(DEFAULT_UNITS)),
-      characters: JSON.parse(JSON.stringify(DEFAULT_CHARACTERS)),
-      laws: JSON.parse(JSON.stringify(DEFAULT_LAWS)),
-    };
-    this.editScenarioDetail(scenario, -1);
-  },
-
-  editScenario(idx) {
-    this.closeModal();
-    const scenarios = Storage.load('scenarios') || [];
-    this.editScenarioDetail(JSON.parse(JSON.stringify(scenarios[idx])), idx);
-  },
-
-  editScenarioDetail(scenario, idx) {
-    let html = `
-      <div class="tabs" id="scenTabs">
-        <button class="tab active" onclick="UI.switchScenTab('basic',this)">基本</button>
-        <button class="tab" onclick="UI.switchScenTab('map',this)">地图</button>
-        <button class="tab" onclick="UI.switchScenTab('factions',this)">派系</button>
-        <button class="tab" onclick="UI.switchScenTab('cities',this)">城池</button>
-        <button class="tab" onclick="UI.switchScenTab('bandits',this)">匪寇</button>
-        <button class="tab" onclick="UI.switchScenTab('chars',this)">人物</button>
-      </div>
-      <div id="scenTabContent"></div>
-    `;
-    const footer = `
-      <button class="btn btn-secondary" onclick="UI.closeModal();UI.openScenarioEditor();">返回</button>
-      <button class="btn btn-primary" onclick="UI.saveScenarioDetail(${idx})">保存剧本</button>
-    `;
-    this._editingScenario = scenario;
-    this.openModal('编辑剧本: '+scenario.name, html, footer, true);
-    this.switchScenTab('basic', document.querySelector('#scenTabs .tab'));
-  },
-
-  switchScenTab(tab, btn) {
-    document.querySelectorAll('#scenTabs .tab').forEach(t=>t.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    const s = this._editingScenario;
-    const ct = $('scenTabContent');
-    
-    switch(tab) {
-      case 'basic':
-        ct.innerHTML = `
-          <div class="form-row"><label class="form-label">剧本名称</label><input class="form-input" id="seName" value="${s.name}"></div>
-          <div class="form-row"><label class="form-label">起始年份</label><input type="number" class="form-input form-input-sm" id="seYear" value="${s.startYear||1}"></div>
-        `;
-        break;
-      case 'map':
-        ct.innerHTML = `
-          <div class="form-row"><label class="form-label">地图底图</label>
-            <div style="margin-bottom:0.5rem;"><img src="${s.mapImage||DEFAULT_MAP_SRC}" style="max-width:100%;max-height:200px;border:1px solid var(--border);border-radius:2px;"></div>
-            <input type="file" accept="image/*" id="seMapFile" onchange="UI.scenMapUpload(event)">
-            <div style="font-size:0.7rem;color:var(--text-dim);margin-top:0.3rem;">上传新的地图图片替换底图</div>
-          </div>
-        `;
-        break;
-      case 'factions':
-        let fhtml = '<div class="search-bar"><input class="form-input" placeholder="搜索派系..." oninput="UI.filterList(this,\'scenFactionList\')"><button class="btn btn-primary" onclick="UI.addScenFaction()">新建派系</button></div><div id="scenFactionList">';
-        s.factions.forEach((f,i) => {
-          fhtml += `<div class="list-item" data-search="${f.name}">
-            <div class="list-item-info">
-              <div class="list-item-name"><span style="display:inline-block;width:14px;height:14px;background:${f.color};border-radius:2px;vertical-align:middle;margin-right:6px;"></span>${f.name}</div>
-              <div class="list-item-desc">金币:${f.gold||0}</div>
-            </div>
-            <div class="list-item-actions">
-              <button class="btn btn-sm btn-secondary" onclick="UI.editScenFaction(${i})">编辑</button>
-              <button class="btn btn-sm btn-danger" onclick="UI._editingScenario.factions.splice(${i},1);UI.switchScenTab('factions')">删除</button>
-            </div>
-          </div>`;
-        });
-        fhtml += '</div>';
-        ct.innerHTML = fhtml;
-        break;
-      case 'cities':
-        let chtml = '<div class="search-bar"><input class="form-input" placeholder="搜索城池..." oninput="UI.filterList(this,\'scenCityList\')"><button class="btn btn-primary" onclick="UI.addScenCity()">新建城池</button></div><div id="scenCityList">';
-        s.cities.forEach((c,i) => {
-          const faction = s.factions.find(f=>f.id===c.factionId);
-          chtml += `<div class="list-item" data-search="${c.name}">
-            <div class="list-item-info">
-              <div class="list-item-name">${c.name}</div>
-              <div class="list-item-desc">人口:${fmtNum(c.population)} 所属:${faction?.name||'无'} 坐标:(${Math.round(c.x)},${Math.round(c.y)})</div>
-            </div>
-            <div class="list-item-actions">
-              <button class="btn btn-sm btn-secondary" onclick="UI.editScenCity(${i})">编辑</button>
-              <button class="btn btn-sm btn-danger" onclick="UI._editingScenario.cities.splice(${i},1);UI.switchScenTab('cities')">删除</button>
-            </div>
-          </div>`;
-        });
-        chtml += '</div>';
-        ct.innerHTML = chtml;
-        break;
-      case 'bandits':
-        let bhtml = '<div class="search-bar"><input class="form-input" placeholder="搜索..." oninput="UI.filterList(this,\'scenBanditList\')"><button class="btn btn-primary" onclick="UI.addScenBandit()">新建匪寇</button></div><div id="scenBanditList">';
-        s.bandits.forEach((b,i) => {
-          bhtml += `<div class="list-item" data-search="${b.name}">
-            <div class="list-item-info">
-              <div class="list-item-name">${b.name}</div>
-              <div class="list-item-desc">兵力:${b.troops} 坐标:(${Math.round(b.x)},${Math.round(b.y)})</div>
-            </div>
-            <div class="list-item-actions">
-              <button class="btn btn-sm btn-danger" onclick="UI._editingScenario.bandits.splice(${i},1);UI.switchScenTab('bandits')">删除</button>
-            </div>
-          </div>`;
-        });
-        bhtml += '</div>';
-        ct.innerHTML = bhtml;
-        break;
-      case 'chars':
-        let chhtml = '<div class="search-bar"><input class="form-input" placeholder="搜索人物..." oninput="UI.filterList(this,\'scenCharList\')"><button class="btn btn-primary" onclick="UI.addScenChar()">新建人物</button></div><div id="scenCharList">';
-        s.characters.forEach((ch,i) => {
-          chhtml += `<div class="list-item" data-search="${ch.name}">
-            <div class="list-item-info">
-              <div class="list-item-name">${ch.name} ${ch.role?'<span class="tag tag-gold">'+ch.role+'</span>':''}</div>
-              <div class="list-item-desc">${ch.culture||''} | 统${ch.skills?.command||0} 政${ch.skills?.admin||0} 外${ch.skills?.diplomacy||0}</div>
-            </div>
-            <div class="list-item-actions">
-              <button class="btn btn-sm btn-secondary" onclick="UI.editScenChar(${i})">编辑</button>
-              <button class="btn btn-sm btn-danger" onclick="UI._editingScenario.characters.splice(${i},1);UI.switchScenTab('chars')">删除</button>
-            </div>
-          </div>`;
-        });
-        chhtml += '</div>';
-        ct.innerHTML = chhtml;
-        break;
-    }
-  },
-
-  scenMapUpload(event) {
-    const file = event.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this._editingScenario.mapImage = e.target.result;
-      this.switchScenTab('map');
-    };
-    reader.readAsDataURL(file);
-  },
-
-  addScenFaction() {
-    const s = this._editingScenario;
-    const colors = ['#c9a84c','#b44040','#3b82a0','#4a8c5c','#7c5cbf','#c47830','#e05090','#40b0b0'];
-    s.factions.push({
-      id:uid(), name:'新派系', color:pick(colors),
-      flagColors:[pick(colors),pick(colors),pick(colors)],
-      gold:1000, capitalId:'',
-      hierarchy:[{title:'君主',holder:'',children:[{title:'将军',holder:'',children:[]},{title:'丞相',holder:'',children:[]}]}],
-    });
-    this.switchScenTab('factions');
-  },
-
-  editScenFaction(idx) {
-    const s = this._editingScenario;
-    const f = s.factions[idx];
-    const colors = ['#c9a84c','#b44040','#3b82a0','#4a8c5c','#7c5cbf','#c47830','#e05090','#40b0b0','#ffffff','#000000','#666666','#304060','#804020'];
-    
-    let flagHtml = '<div class="flag-preview" id="flagPrev">' + (f.flagColors||[]).map(c=>`<div class="flag-stripe" style="background:${c}"></div>`).join('') + '</div>';
-    flagHtml += '<div style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-dim)">旗帜竖条数量：<input type="number" id="flagCount" value="'+(f.flagColors?.length||3)+'" min="1" max="6" style="width:50px" class="form-input form-input-sm" onchange="UI.updateFlagStripes('+idx+')"></div>';
-    flagHtml += '<div style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-dim)">点击颜色选取，再点旗帜竖条替换：</div>';
-    flagHtml += '<div class="flag-editor-colors">';
-    colors.forEach(c => {
-      flagHtml += `<div class="flag-color-btn" style="background:${c}" onclick="UI._selectedFlagColor='${c}';document.querySelectorAll('.flag-color-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"></div>`;
-    });
-    flagHtml += '<input type="color" style="width:24px;height:24px;border:none;cursor:pointer;" onchange="UI._selectedFlagColor=this.value">';
-    flagHtml += '</div>';
-
-    let hierarchyHtml = '<div style="margin-top:1rem;"><div class="form-label">职权结构（可拖动排序）</div>';
-    hierarchyHtml += this.renderEditableHierarchy(f.hierarchy||[], idx);
-    hierarchyHtml += `<button class="btn btn-sm btn-secondary" onclick="UI.addHierarchyNode(${idx})" style="margin-top:0.5rem;">+ 添加职位</button>`;
-    hierarchyHtml += '</div>';
-
-    const html = `
-      <div class="form-row"><label class="form-label">派系名称</label><input class="form-input" id="sfName" value="${f.name}"></div>
-      <div class="form-row"><label class="form-label">代表颜色</label>
-        <div style="display:flex;gap:0.5rem;align-items:center;">
-          <input type="color" id="sfColor" value="${f.color}" style="width:40px;height:30px;border:none;cursor:pointer;">
-          <span style="font-size:0.75rem;color:var(--text-dim);">${f.color}</span>
-        </div>
-      </div>
-      <div class="form-row"><label class="form-label">初始金币</label><input type="number" class="form-input form-input-sm" id="sfGold" value="${f.gold||1000}"></div>
-      <div class="form-row"><label class="form-label">旗帜设计</label>${flagHtml}</div>
-      ${hierarchyHtml}
-    `;
-    const footer = `
-      <button class="btn btn-secondary" onclick="UI.switchScenTab('factions')">取消</button>
-      <button class="btn btn-primary" onclick="UI.saveScenFaction(${idx})">保存</button>
-    `;
-    $('scenTabContent').innerHTML = html;
-    $('modalFooter').innerHTML = footer + `<button class="btn btn-primary" style="margin-left:auto;" onclick="UI.saveScenarioDetail(${this._editingScenarioIdx??-1})">保存剧本</button>`;
-  },
-
-  renderEditableHierarchy(nodes, factionIdx, path='') {
-    let html = '<div class="hierarchy-tree" data-path="'+path+'">';
-    nodes.forEach((node, i) => {
-      const curPath = path ? path+'.'+i : ''+i;
-      html += `<div class="hierarchy-node" draggable="true" data-path="${curPath}" 
-        ondragstart="UI.hierDragStart(event,'${curPath}')" 
-        ondragover="UI.hierDragOver(event)" 
-        ondrop="UI.hierDrop(event,'${curPath}',${factionIdx})">
-        <span class="hierarchy-handle">☰</span>
-        <input class="form-input" style="width:80px;padding:0.2rem 0.4rem;font-size:0.75rem;" value="${node.title}" onchange="UI.updateHierTitle(${factionIdx},'${curPath}',this.value)">
-        <span style="color:var(--text-dim);">:</span>
-        <input class="form-input" style="flex:1;padding:0.2rem 0.4rem;font-size:0.75rem;" value="${node.holder||''}" placeholder="持有者" onchange="UI.updateHierHolder(${factionIdx},'${curPath}',this.value)">
-        <button class="btn btn-sm btn-secondary" onclick="UI.addChildHierNode(${factionIdx},'${curPath}')" title="添加下级">+</button>
-        <button class="btn btn-sm btn-danger btn-icon-only" onclick="UI.removeHierNode(${factionIdx},'${curPath}')" title="删除">✕</button>
-      </div>`;
-      if(node.children && node.children.length) {
-        html += '<div class="hierarchy-children">' + this.renderEditableHierarchy(node.children, factionIdx, curPath) + '</div>';
-      }
-    });
-    html += '</div>';
-    return html;
-  },
-
-  getHierNode(nodes, path) {
-    const parts = path.split('.').map(Number);
-    let current = nodes;
-    for(let i=0;i<parts.length-1;i++) {
-      current = current[parts[i]].children;
-    }
-    return { parent:current, index:parts[parts.length-1], node:current[parts[parts.length-1]] };
-  },
-
-  updateHierTitle(fIdx, path, val) {
-    const f = this._editingScenario.factions[fIdx];
-    const {node} = this.getHierNode(f.hierarchy, path);
-    if(node) node.title = val;
-  },
-  updateHierHolder(fIdx, path, val) {
-    const f = this._editingScenario.factions[fIdx];
-    const {node} = this.getHierNode(f.hierarchy, path);
-    if(node) node.holder = val;
-  },
-  addHierarchyNode(fIdx) {
-    const f = this._editingScenario.factions[fIdx];
-    if(!f.hierarchy) f.hierarchy = [];
-    f.hierarchy.push({title:'新职位',holder:'',children:[]});
-    this.editScenFaction(fIdx);
-  },
-  addChildHierNode(fIdx, path) {
-    const f = this._editingScenario.factions[fIdx];
-    const {node} = this.getHierNode(f.hierarchy, path);
-    if(!node.children) node.children = [];
-    node.children.push({title:'下级',holder:'',children:[]});
-    this.editScenFaction(fIdx);
-  },
-  removeHierNode(fIdx, path) {
-    const f = this._editingScenario.factions[fIdx];
-    const {parent,index} = this.getHierNode(f.hierarchy, path);
-    parent.splice(index,1);
-    this.editScenFaction(fIdx);
-  },
-
-  _hierDragPath: null,
-  hierDragStart(e, path) { this._hierDragPath = path; e.dataTransfer.effectAllowed='move'; },
-  hierDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect='move'; },
-  hierDrop(e, targetPath, fIdx) {
-    e.preventDefault();
-    if(!this._hierDragPath || this._hierDragPath === targetPath) return;
-    // Simple swap for now
-    const f = this._editingScenario.factions[fIdx];
-    const src = this.getHierNode(f.hierarchy, this._hierDragPath);
-    const dst = this.getHierNode(f.hierarchy, targetPath);
-    if(src.node && dst.node) {
-      const temp = {...src.node};
-      Object.assign(src.node, dst.node);
-      Object.assign(dst.node, temp);
-    }
-    this._hierDragPath = null;
-    this.editScenFaction(fIdx);
-  },
-
-  updateFlagStripes(fIdx) {
-    const f = this._editingScenario.factions[fIdx];
-    const count = parseInt($('flagCount').value)||3;
-    while(f.flagColors.length < count) f.flagColors.push('#666666');
-    while(f.flagColors.length > count) f.flagColors.pop();
-    this.editScenFaction(fIdx);
-  },
-
-  saveScenFaction(idx) {
-    const f = this._editingScenario.factions[idx];
-    f.name = $('sfName').value || f.name;
-    f.color = $('sfColor').value;
-    f.gold = parseInt($('sfGold').value)||1000;
-    this.switchScenTab('factions');
-  },
-
-  addScenCity() {
-    const s = this._editingScenario;
-    s.cities.push({
-      id:uid(), name:'新城池',
-      x:randInt(100,1000), y:randInt(100,400),
-      population:1000, economyLevel:1, defense:10, garrison:50,
-      factionId:s.factions[0]?.id||'', cultureId:'',
-      type:'', tags:[],
-    });
-    this.switchScenTab('cities');
-  },
-
-  editScenCity(idx) {
-    const s = this._editingScenario;
-    const c = s.cities[idx];
-    const html = `
-      <div class="form-row"><label class="form-label">名称</label><input class="form-input" id="scName" value="${c.name}"></div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">X坐标</label><input type="number" class="form-input" id="scX" value="${Math.round(c.x)}"></div>
-        <div class="form-row"><label class="form-label">Y坐标</label><input type="number" class="form-input" id="scY" value="${Math.round(c.y)}"></div>
-      </div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">人口</label><input type="number" class="form-input" id="scPop" value="${c.population}"></div>
-        <div class="form-row"><label class="form-label">经济等级</label><input type="number" class="form-input" id="scEcon" value="${c.economyLevel}"></div>
-      </div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">防御</label><input type="number" class="form-input" id="scDef" value="${c.defense}"></div>
-        <div class="form-row"><label class="form-label">驻军</label><input type="number" class="form-input" id="scGar" value="${c.garrison||0}"></div>
-      </div>
-      <div class="form-row"><label class="form-label">类型</label><input class="form-input" id="scType" value="${c.type||''}"></div>
-      <div class="form-row"><label class="form-label">标签</label><input class="form-input" id="scTags" value="${(c.tags||[]).join(',')}"></div>
-      <div class="form-row"><label class="form-label">所属派系</label>
-        <select class="form-select" id="scFaction">
-          <option value="">无</option>
-          ${s.factions.map(f=>`<option value="${f.id}" ${f.id===c.factionId?'selected':''}>${f.name}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-row"><label class="form-label">民族文化</label>
-        <select class="form-select" id="scCulture">
-          <option value="">无</option>
-          ${s.cultures.map(cu=>`<option value="${cu.id}" ${cu.id===c.cultureId?'selected':''}>${cu.name}</option>`).join('')}
-        </select>
-      </div>
-    `;
-    $('scenTabContent').innerHTML = html;
-    $('modalFooter').innerHTML = `
-      <button class="btn btn-secondary" onclick="UI.switchScenTab('cities')">取消</button>
-      <button class="btn btn-primary" onclick="UI.saveScenCity(${idx})">保存城池</button>
-    `;
-  },
-
-  saveScenCity(idx) {
-    const c = this._editingScenario.cities[idx];
-    c.name = $('scName').value||c.name;
-    c.x = parseInt($('scX').value)||c.x;
-    c.y = parseInt($('scY').value)||c.y;
-    c.population = parseInt($('scPop').value)||c.population;
-    c.economyLevel = parseInt($('scEcon').value)||c.economyLevel;
-    c.defense = parseInt($('scDef').value)||c.defense;
-    c.garrison = parseInt($('scGar').value)||0;
-    c.type = $('scType').value;
-    c.tags = $('scTags').value.split(',').map(s=>s.trim()).filter(Boolean);
-    c.factionId = $('scFaction').value;
-    c.cultureId = $('scCulture').value;
-    this.switchScenTab('cities');
-  },
-
-  addScenBandit() {
-    this._editingScenario.bandits.push({
-      id:uid(), name:pick(['流寇','山贼','海盗','叛军']),
-      x:randInt(100,1000), y:randInt(100,400),
-      troops:randInt(50,300), atk:randInt(3,8), def:randInt(2,6),
-    });
-    this.switchScenTab('bandits');
-  },
-
-  addScenChar() {
-    this._editingScenario.characters.push({
-      id:uid(), name:'新人物', culture:'',
-      factionId:this._editingScenario.factions[0]?.id||'',
-      role:'', skills:{command:50,admin:50,diplomacy:50}, desc:'',
-    });
-    this.switchScenTab('chars');
-  },
-
-  editScenChar(idx) {
-    const s = this._editingScenario;
-    const ch = s.characters[idx];
-    const html = `
-      <div class="form-row"><label class="form-label">名称</label><input class="form-input" id="schName" value="${ch.name}"></div>
-      <div class="form-row"><label class="form-label">文化</label><input class="form-input" id="schCulture" value="${ch.culture||''}"></div>
-      <div class="form-row"><label class="form-label">所属派系</label>
-        <select class="form-select" id="schFaction">
-          <option value="">无</option>
-          ${s.factions.map(f=>`<option value="${f.id}" ${f.id===ch.factionId?'selected':''}>${f.name}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-row"><label class="form-label">职位</label><input class="form-input" id="schRole" value="${ch.role||''}"></div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">统率</label><input type="number" class="form-input" id="schCmd" value="${ch.skills?.command||50}" min="0" max="100"></div>
-        <div class="form-row"><label class="form-label">政治</label><input type="number" class="form-input" id="schAdm" value="${ch.skills?.admin||50}" min="0" max="100"></div>
-        <div class="form-row"><label class="form-label">外交</label><input type="number" class="form-input" id="schDip" value="${ch.skills?.diplomacy||50}" min="0" max="100"></div>
-      </div>
-      <div class="form-row"><label class="form-label">描述</label><textarea class="form-textarea" id="schDesc">${ch.desc||''}</textarea></div>
-    `;
-    $('scenTabContent').innerHTML = html;
-    $('modalFooter').innerHTML = `
-      <button class="btn btn-secondary" onclick="UI.switchScenTab('chars')">取消</button>
-      <button class="btn btn-primary" onclick="UI.saveScenChar(${idx})">保存</button>
-    `;
-  },
-
-  saveScenChar(idx) {
-    const ch = this._editingScenario.characters[idx];
-    ch.name = $('schName').value||ch.name;
-    ch.culture = $('schCulture').value;
-    ch.factionId = $('schFaction').value;
-    ch.role = $('schRole').value;
-    ch.skills = {
-      command: clamp(parseInt($('schCmd').value)||50,0,100),
-      admin: clamp(parseInt($('schAdm').value)||50,0,100),
-      diplomacy: clamp(parseInt($('schDip').value)||50,0,100),
-    };
-    ch.desc = $('schDesc').value;
-    this.switchScenTab('chars');
-  },
-
-  saveScenarioDetail(idx) {
-    const s = this._editingScenario;
-    s.name = $('seName')?.value || s.name;
-    s.startYear = parseInt($('seYear')?.value)||s.startYear;
-    
-    const scenarios = Storage.load('scenarios') || [];
-    if(idx >= 0) {
-      scenarios[idx] = s;
-    } else {
-      scenarios.push(s);
-    }
-    Storage.save('scenarios', scenarios);
-    this.closeModal();
-    this.openScenarioEditor();
-  },
-
-  useScenario(idx) {
-    const scenarios = Storage.load('scenarios') || [];
-    this.closeModal();
-    this.openScenarioSetup(JSON.parse(JSON.stringify(scenarios[idx])));
-  },
-
-  deleteScenario(idx) {
-    if(!confirm('确定删除该剧本？')) return;
-    const scenarios = Storage.load('scenarios') || [];
-    scenarios.splice(idx,1);
-    Storage.save('scenarios', scenarios);
-    this.openScenarioEditor();
-  },
-
-  // --- Start Game ---
-  startGame() {
-    this.openScenarioEditor();
-  },
-
-  // --- Save Manager ---
-  openSaveManager() {
-    const saves = Storage.listSaves();
-    let html = '<div class="search-bar"><input class="form-input" placeholder="搜索存档..." oninput="UI.filterList(this,\'saveList\')"></div><div id="saveList">';
-    if(!saves.length) html += '<div class="empty-state">暂无存档</div>';
-    saves.forEach(s => {
-      html += `<div class="list-item" data-search="${s.name}">
-        <div class="list-item-info">
-          <div class="list-item-name">${s.name}</div>
-          <div class="list-item-desc">${s.date||''}</div>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn btn-sm btn-primary" onclick="UI.closeModal();Game.loadGame('${s.key}')">读取</button>
-          <button class="btn btn-sm btn-danger" onclick="Storage.delete('${s.key}');UI.openSaveManager();">删除</button>
-        </div>
-      </div>`;
-    });
-    html += '</div>';
-    this.openModal('存档管理', html);
-  },
-
-  // --- Tech Editor ---
-  openTechEditor() {
-    const techTree = Storage.load('customTech') || JSON.parse(JSON.stringify(DEFAULT_TECH_TREE));
-    let html = '';
-    techTree.forEach((era, ei) => {
-      html += `<div class="tech-era">
-        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
-          <input class="form-input" value="${era.era}" onchange="this.dataset.val=this.value" style="font-size:0.85rem;font-weight:700;color:var(--accent-gold);background:transparent;border-color:transparent;padding:0.2rem 0;" data-era="${ei}" id="eraName_${ei}">
-          <button class="btn btn-sm btn-secondary" onclick="UI._addTechToEra(${ei})">+ 科技</button>
-        </div>
-        <div class="tech-nodes" id="eraTechs_${ei}">`;
-      era.techs.forEach((tech, ti) => {
-        html += `<div class="tech-node" style="cursor:default;">
-          <input class="form-input" value="${tech.name}" style="font-size:0.75rem;padding:0.1rem 0.3rem;font-weight:700;" data-era="${ei}" data-tech="${ti}" data-field="name">
-          <div style="display:flex;gap:0.3rem;margin-top:0.2rem;">
-            <span style="font-size:0.65rem;color:var(--text-dim);">费用:</span>
-            <input type="number" class="form-input" value="${tech.cost}" style="width:50px;font-size:0.65rem;padding:0.1rem 0.2rem;" data-era="${ei}" data-tech="${ti}" data-field="cost">
-          </div>
-          <button class="btn btn-sm btn-danger btn-icon-only" onclick="UI._removeTech(${ei},${ti})" style="position:absolute;top:2px;right:2px;font-size:0.6rem;">✕</button>
-        </div>`;
-      });
-      html += '</div></div>';
-    });
-    html += `<button class="btn btn-secondary" onclick="UI._addEra()" style="margin-top:0.5rem;">+ 新增时代</button>`;
-    
-    const footer = `
-      <button class="btn btn-secondary" onclick="UI.closeModal()">取消</button>
-      <button class="btn btn-danger" onclick="Storage.delete('customTech');UI.closeModal();UI.openTechEditor();">重置默认</button>
-      <button class="btn btn-primary" onclick="UI._saveTechEditor()">保存</button>
-    `;
-    this._techEditorData = techTree;
-    this.openModal('自定义科技树', html, footer, true);
-  },
-
-  _addEra() {
-    this._techEditorData.push({era:'新时代',techs:[]});
-    this.closeModal();
-    this.openTechEditor();
-  },
-  _addTechToEra(ei) {
-    this._techEditorData[ei].techs.push({id:'t_'+uid(),name:'新科技',cost:50,desc:'',effects:{}});
-    this.closeModal();
-    this.openTechEditor();
-  },
-  _removeTech(ei,ti) {
-    this._techEditorData[ei].techs.splice(ti,1);
-    this.closeModal();
-    this.openTechEditor();
-  },
-  _saveTechEditor() {
-    // Read all inputs
-    document.querySelectorAll('[data-era][data-field]').forEach(input => {
-      const ei = parseInt(input.dataset.era);
-      const ti = parseInt(input.dataset.tech);
-      const field = input.dataset.field;
-      if(field==='name') this._techEditorData[ei].techs[ti].name = input.value;
-      if(field==='cost') this._techEditorData[ei].techs[ti].cost = parseInt(input.value)||50;
-    });
-    // Read era names
-    this._techEditorData.forEach((era,ei) => {
-      const input = $('eraName_'+ei);
-      if(input) era.era = input.value;
-    });
-    Storage.save('customTech', this._techEditorData);
-    this.closeModal();
-  },
-
-  // --- Culture Editor ---
-  openCultureEditor() {
-    const cultures = Storage.load('customCultures') || JSON.parse(JSON.stringify(DEFAULT_CULTURES));
-    let html = '<div class="search-bar"><input class="form-input" placeholder="搜索文化..." oninput="UI.filterList(this,\'cultureList\')"><button class="btn btn-primary" onclick="UI._addCulture()">新建文化</button></div><div id="cultureList">';
-    cultures.forEach((c,i) => {
-      html += `<div class="list-item" data-search="${c.name}">
-        <div class="list-item-info">
-          <div class="list-item-name">${c.name}</div>
-          <div class="list-item-desc">${c.desc||''}</div>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn btn-sm btn-secondary" onclick="UI._editCulture(${i})">编辑</button>
-          <button class="btn btn-sm btn-danger" onclick="UI._cultureData.splice(${i},1);Storage.save('customCultures',UI._cultureData);UI.closeModal();UI.openCultureEditor();">删除</button>
-        </div>
-      </div>`;
-    });
-    html += '</div>';
-    this._cultureData = cultures;
-    this.openModal('自定义民族文化', html, '<button class="btn btn-secondary" onclick="UI.closeModal()">关闭</button>', true);
-  },
-
-  _addCulture() {
-    this._cultureData.push({id:'c_'+uid(),name:'新文化',desc:'',bonuses:{},units:[]});
-    Storage.save('customCultures',this._cultureData);
-    this.closeModal();
-    this.openCultureEditor();
-  },
-
-  _editCulture(idx) {
-    const c = this._cultureData[idx];
-    const html = `
-      <div class="form-row"><label class="form-label">名称</label><input class="form-input" id="cuName" value="${c.name}"></div>
-      <div class="form-row"><label class="form-label">描述</label><textarea class="form-textarea" id="cuDesc">${c.desc||''}</textarea></div>
-      <div class="form-row"><label class="form-label">加成（JSON格式）</label><textarea class="form-textarea" id="cuBonuses">${JSON.stringify(c.bonuses||{})}</textarea></div>
-    `;
-    this.openModal('编辑文化: '+c.name, html, `
-      <button class="btn btn-secondary" onclick="UI.closeModal();UI.openCultureEditor();">取消</button>
-      <button class="btn btn-primary" onclick="UI._saveCulture(${idx})">保存</button>
-    `);
-  },
-
-  _saveCulture(idx) {
-    const c = this._cultureData[idx];
-    c.name = $('cuName').value||c.name;
-    c.desc = $('cuDesc').value;
-    try { c.bonuses = JSON.parse($('cuBonuses').value); } catch(e) {}
-    Storage.save('customCultures',this._cultureData);
-    this.closeModal();
-    this.openCultureEditor();
-  },
-
-  // --- Character Editor ---
-  openCharacterEditor() {
-    const chars = Storage.load('customChars') || JSON.parse(JSON.stringify(DEFAULT_CHARACTERS));
-    let html = '<div class="search-bar"><input class="form-input" placeholder="搜索人物..." oninput="UI.filterList(this,\'charEdList\')"><button class="btn btn-primary" onclick="UI._addChar()">新建人物</button></div><div id="charEdList">';
-    chars.forEach((ch,i) => {
-      html += `<div class="list-item" data-search="${ch.name}">
-        <div class="list-item-info">
-          <div class="list-item-name">${ch.name}</div>
-          <div class="list-item-desc">${ch.desc||''} | 统${ch.skills?.command||0} 政${ch.skills?.admin||0} 外${ch.skills?.diplomacy||0}</div>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn btn-sm btn-secondary" onclick="UI._editCharGlobal(${i})">编辑</button>
-          <button class="btn btn-sm btn-danger" onclick="UI._charData.splice(${i},1);Storage.save('customChars',UI._charData);UI.closeModal();UI.openCharacterEditor();">删除</button>
-        </div>
-      </div>`;
-    });
-    html += '</div>';
-    this._charData = chars;
-    this.openModal('自定义重要人物', html, '<button class="btn btn-secondary" onclick="UI.closeModal()">关闭</button>', true);
-  },
-
-  _addChar() {
-    this._charData.push({id:'ch_'+uid(),name:'新人物',culture:'',skills:{command:50,admin:50,diplomacy:50},desc:''});
-    Storage.save('customChars',this._charData);
-    this.closeModal();
-    this.openCharacterEditor();
-  },
-
-  _editCharGlobal(idx) {
-    const ch = this._charData[idx];
-    const html = `
-      <div class="form-row"><label class="form-label">名称</label><input class="form-input" id="gchName" value="${ch.name}"></div>
-      <div class="form-row"><label class="form-label">文化</label><input class="form-input" id="gchCulture" value="${ch.culture||''}"></div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">统率</label><input type="number" class="form-input" id="gchCmd" value="${ch.skills?.command||50}" min="0" max="100"></div>
-        <div class="form-row"><label class="form-label">政治</label><input type="number" class="form-input" id="gchAdm" value="${ch.skills?.admin||50}" min="0" max="100"></div>
-        <div class="form-row"><label class="form-label">外交</label><input type="number" class="form-input" id="gchDip" value="${ch.skills?.diplomacy||50}" min="0" max="100"></div>
-      </div>
-      <div class="form-row"><label class="form-label">描述</label><textarea class="form-textarea" id="gchDesc">${ch.desc||''}</textarea></div>
-    `;
-    this.openModal('编辑人物: '+ch.name, html, `
-      <button class="btn btn-secondary" onclick="UI.closeModal();UI.openCharacterEditor();">取消</button>
-      <button class="btn btn-primary" onclick="UI._saveCharGlobal(${idx})">保存</button>
-    `);
-  },
-
-  _saveCharGlobal(idx) {
-    const ch = this._charData[idx];
-    ch.name = $('gchName').value||ch.name;
-    ch.culture = $('gchCulture').value;
-    ch.skills = {
-      command:clamp(parseInt($('gchCmd').value)||50,0,100),
-      admin:clamp(parseInt($('gchAdm').value)||50,0,100),
-      diplomacy:clamp(parseInt($('gchDip').value)||50,0,100),
-    };
-    ch.desc = $('gchDesc').value;
-    Storage.save('customChars',this._charData);
-    this.closeModal();
-    this.openCharacterEditor();
-  },
-
-  // --- Unit Editor ---
-  openUnitEditor() {
-    const units = Storage.load('customUnits') || JSON.parse(JSON.stringify(DEFAULT_UNITS));
-    let html = '<div class="search-bar"><input class="form-input" placeholder="搜索兵种..." oninput="UI.filterList(this,\'unitEdList\')"><button class="btn btn-primary" onclick="UI._addUnit()">新建兵种</button></div><div id="unitEdList">';
-    units.forEach((u,i) => {
-      html += `<div class="list-item" data-search="${u.name} ${u.culture}">
-        <div class="list-item-info">
-          <div class="list-item-name">${u.name} <span class="tag">${u.type==='land'?'陆':u.type==='naval'?'海':'空'}</span> <span class="tag">${u.culture}</span></div>
-          <div class="list-item-desc">攻${u.atk} 防${u.def} 费${u.cost} 维${u.upkeep}</div>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn btn-sm btn-secondary" onclick="UI._editUnit(${i})">编辑</button>
-          <button class="btn btn-sm btn-danger" onclick="UI._unitData.splice(${i},1);Storage.save('customUnits',UI._unitData);UI.closeModal();UI.openUnitEditor();">删除</button>
-        </div>
-      </div>`;
-    });
-    html += '</div>';
-    this._unitData = units;
-    this.openModal('自定义兵种', html, '<button class="btn btn-secondary" onclick="UI.closeModal()">关闭</button>', true);
-  },
-
-  _addUnit() {
-    this._unitData.push({id:'u_'+uid(),name:'新兵种',culture:'通用',type:'land',atk:5,def:5,cost:20,upkeep:2,desc:''});
-    Storage.save('customUnits',this._unitData);
-    this.closeModal();
-    this.openUnitEditor();
-  },
-
-  _editUnit(idx) {
-    const u = this._unitData[idx];
-    const html = `
-      <div class="form-row"><label class="form-label">名称</label><input class="form-input" id="euName" value="${u.name}"></div>
-      <div class="form-row"><label class="form-label">所属文化</label><input class="form-input" id="euCulture" value="${u.culture||'通用'}" placeholder="通用"></div>
-      <div class="form-row"><label class="form-label">类型</label>
-        <select class="form-select" id="euType">
-          <option value="land" ${u.type==='land'?'selected':''}>陆军</option>
-          <option value="naval" ${u.type==='naval'?'selected':''}>海军</option>
-          <option value="air" ${u.type==='air'?'selected':''}>空军</option>
-        </select>
-      </div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">攻击</label><input type="number" class="form-input" id="euAtk" value="${u.atk}"></div>
-        <div class="form-row"><label class="form-label">防御</label><input type="number" class="form-input" id="euDef" value="${u.def}"></div>
-      </div>
-      <div class="form-row-inline">
-        <div class="form-row"><label class="form-label">费用</label><input type="number" class="form-input" id="euCost" value="${u.cost}"></div>
-        <div class="form-row"><label class="form-label">维护</label><input type="number" class="form-input" id="euUpkeep" value="${u.upkeep}"></div>
-      </div>
-      <div class="form-row"><label class="form-label">描述</label><textarea class="form-textarea" id="euDesc">${u.desc||''}</textarea></div>
-    `;
-    this.openModal('编辑兵种: '+u.name, html, `
-      <button class="btn btn-secondary" onclick="UI.closeModal();UI.openUnitEditor();">取消</button>
-      <button class="btn btn-primary" onclick="UI._saveUnit(${idx})">保存</button>
-    `);
-  },
-
-  _saveUnit(idx) {
-    const u = this._unitData[idx];
-    u.name = $('euName').value||u.name;
-    u.culture = $('euCulture').value||'通用';
-    u.type = $('euType').value;
-    u.atk = parseInt($('euAtk').value)||5;
-    u.def = parseInt($('euDef').value)||5;
-    u.cost = parseInt($('euCost').value)||20;
-    u.upkeep = parseInt($('euUpkeep').value)||2;
-    u.desc = $('euDesc').value;
-    Storage.save('customUnits',this._unitData);
-    this.closeModal();
-    this.openUnitEditor();
-  },
-
-  // --- Back to Menu ---
-  backToMenu() {
-    if(GameState.playing && !confirm('返回主菜单？未保存的进度将丢失。')) return;
-    GameState.playing = false;
-    if(Game.tickInterval) clearInterval(Game.tickInterval);
-    $('gameUI').classList.remove('active');
-    $('mainMenu').style.display = '';
-    this.closePanel();
-  },
-};
-
-// ============================================================
-// DEFAULT MAP (embedded)
-// ============================================================
-const DEFAULT_MAP_SRC = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgFBgcGBQgHBgcJCAgJDBMMDAsLDBgREg4THBgdHRsY
+const D_CUL=[{id:'c_han',name:'汉族',desc:'中原大地',bon:{pg:.1,rs:.05}},{id:'c_nomad',name:'游牧',desc:'草原勇士',bon:{as:.2,aa:5}},{id:'c_viking',name:'维京',desc:'北海战士',bon:{np:10,aa:3}},{id:'c_roman',name:'罗马',desc:'秩序缔造者',bon:{tx:.1,cd:5}},{id:'c_arab',name:'阿拉伯',desc:'商贸信仰',bon:{tx:.15,rs:.1}}];
+const D_UNIT=[{id:'u_mil',name:'民兵',cul:'通用',tp:'land',atk:3,def:2,cost:10,up:1},{id:'u_jian',name:'剑士',cul:'汉族',tp:'land',atk:8,def:5,cost:30,up:3},{id:'u_nu',name:'弩兵',cul:'汉族',tp:'land',atk:10,def:3,cost:35,up:4},{id:'u_qi',name:'铁骑',cul:'游牧',tp:'land',atk:12,def:6,cost:50,up:5},{id:'u_bsk',name:'狂战士',cul:'维京',tp:'land',atk:15,def:2,cost:40,up:4},{id:'u_leg',name:'军团兵',cul:'罗马',tp:'land',atk:9,def:9,cost:45,up:4},{id:'u_mam',name:'马穆鲁克',cul:'阿拉伯',tp:'land',atk:11,def:7,cost:55,up:5},{id:'u_ship',name:'战船',cul:'通用',tp:'naval',atk:10,def:8,cost:80,up:6},{id:'u_jet',name:'战斗机',cul:'通用',tp:'air',atk:20,def:5,cost:200,up:15},{id:'u_bomb',name:'轰炸机',cul:'通用',tp:'air',atk:30,def:3,cost:300,up:20}];
+const D_CHAR=[{id:'ch1',name:'始皇大帝',cul:'汉族',sk:{c:90,a:85,d:60},desc:'千古一帝'},{id:'ch2',name:'铁木真',cul:'游牧',sk:{c:95,a:70,d:50},desc:'一代天骄'},{id:'ch3',name:'凯撒',cul:'罗马',sk:{c:88,a:80,d:75},desc:'征服者'}];
+const D_LAW={gov:{n:'政体',o:['部落制','封建制','君主专制','寡头共和','民主共和','军政府'],v:'封建制'},eco:{n:'经济',o:['自给自足','封建庄园','商业经济','计划经济','市场经济'],v:'封建庄园'},mil:{n:'兵役',o:['部族征召','封建骑士','征兵制','职业军队','全民皆兵'],v:'封建骑士'},tax:{n:'税收',o:['免税','轻税','中等','重税','榨取'],v:'中等'},rel:{n:'宗教',o:['泛神','国教','宽容','政教分离','无神论'],v:'宽容'},ctz:{n:'公民权',o:['奴隶制','农奴制','有限公民权','完全公民权'],v:'有限公民权'},trd:{n:'贸易',o:['闭关锁国','保护主义','自由贸易'],v:'保护主义'},edu:{n:'教育',o:['无教育','精英教育','义务教育','全民高等'],v:'精英教育'}};
+const LFX={tax:{'免税':{pg:.15,tm:0},'轻税':{pg:.05,tm:.5},'中等':{tm:1},'重税':{tm:1.5,pg:-.05},'榨取':{tm:2,pg:-.15}},mil:{'部族征召':{rc:.5},'封建骑士':{rc:1},'征兵制':{rc:.7},'职业军队':{rc:1.5},'全民皆兵':{rc:.3,pg:-.1}}};
+
+const DM='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgFBgcGBQgHBgcJCAgJDBMMDAsLDBgREg4THBgdHRsY
 GxofIywlHyEqIRobJjQnKi4vMTIxHiU2OjYwOiwwMTD/2wBDAQgJCQwKDBcMDBcwIBsgMDAwMDAw
 MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDD/wAARCAP7BdcDASIA
 AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
@@ -5017,14 +2144,258 @@ ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigBprxb42aIdH1qy8VWMJ2EiG8RBtBXnD
 MenUjrXtVcV8Zf8Akmet/wDXMf8AoQrSlJxmmjOrBTg0zz1XDAMCGU85UZFLWV4W/wCQDaf7latf
 dUneCZ8ZVioTcUFFFFamQUUUUAFFFFAH/9l+3VMJAAAAAGEgiXSk/lClshVmq9mjW0k=';
 
-// ============================================================
-// INIT
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-  MapCtrl.init();
-  // Close context menu on click elsewhere
-  document.addEventListener('click', () => UI.hideContextMenu());
+// ==== GAME STATE ====
+let S={on:false,sp:1,t:{y:1,m:1,d:1},pf:null,fs:[],cs:[],as:[],bs:[],tt:null,cul:null,un:null,ch:null,laws:null,res:{},cr:null,rp:0,wars:[],map:'',inc:0,upk:0,bcd:{}};
+
+// ==== MAP ====
+const M={
+s:1,ox:0,oy:0,dr:false,lx:0,ly:0,iw:0,ih:0,
+init(){
+  const c=$('mc'),im=$('mi');
+  c.addEventListener('mousedown',e=>{if(e.button===2)return;M.dr=true;M.lx=e.clientX;M.ly=e.clientY;c.classList.add('drg')});
+  window.addEventListener('mousemove',e=>{if(!M.dr)return;M.ox+=e.clientX-M.lx;M.oy+=e.clientY-M.ly;M.lx=e.clientX;M.ly=e.clientY;M.apply()});
+  window.addEventListener('mouseup',()=>{M.dr=false;c.classList.remove('drg')});
+  c.addEventListener('wheel',e=>{e.preventDefault();const r=c.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,os=M.s;M.s=CL(M.s*(e.deltaY>0?.9:1.1),.15,6);const rt=M.s/os;M.ox=mx-(mx-M.ox)*rt;M.oy=my-(my-M.oy)*rt;M.apply()},{passive:false});
+  c.addEventListener('contextmenu',e=>{if(!S.on)return;e.preventDefault();const r=c.getBoundingClientRect();UI.showCtx(e.clientX,e.clientY,(e.clientX-r.left-M.ox)/M.s,(e.clientY-r.top-M.oy)/M.s)});
+  im.onload=()=>{M.iw=im.naturalWidth;M.ih=im.naturalHeight;const cw=c.clientWidth,ch=c.clientHeight;M.s=Math.min(cw/M.iw,ch/M.ih)*.9;M.ox=(cw-M.iw*M.s)/2;M.oy=(ch-M.ih*M.s)/2;M.apply();$('mmi').src=im.src}
+},
+load(src){$('mi').src=src},
+apply(){$('cv').style.transform=`translate(${M.ox}px,${M.oy}px) scale(${M.s})`;const c=$('mc'),mm=$('mm');if(!M.iw)return;const mw=mm.clientWidth,mh=mm.clientHeight,sx=mw/M.iw,sy=mh/M.ih,v=$('mmv');v.style.width=CL((c.clientWidth/M.s)*sx,3,mw)+'px';v.style.height=CL((c.clientHeight/M.s)*sy,3,mh)+'px';v.style.left=CL((-M.ox/M.s)*sx,0,mw)+'px';v.style.top=CL((-M.oy/M.s)*sy,0,mh)+'px'},
+render(){
+  const cv=$('cv');cv.querySelectorAll('.cm,.am,.bm').forEach(e=>e.remove());
+  S.cs.forEach(c=>{const el=document.createElement('div');el.className='cm';el.style.cssText=`left:${c.x}px;top:${c.y}px`;const f=S.fs.find(f=>f.id===c.fid),co=f?f.col:'#888',cap=f&&f.cap===c.id;el.innerHTML=`<div class="cd_${cap?' cp':''}" style="border-color:${co};${cap?'background:'+co:''}"></div><div class="cla">${E(c.name)}</div>`;el.onclick=e=>{e.stopPropagation();UI.cityDetail(c.id)};cv.appendChild(el)});
+  S.as.forEach(a=>{const el=document.createElement('div');el.className='am';el.style.cssText=`left:${a.x}px;top:${a.y}px`;const f=S.fs.find(f=>f.id===a.fid),co=f?f.col:'#888';el.innerHTML=`<div class="ai_" style="background:${co}22;border-color:${co};color:${co}">${a.tp==='naval'?'⛵':a.tp==='air'?'✈':'⚔'}</div><div class="ac_">${F(a.n)}</div>`;el.onclick=e=>{e.stopPropagation();UI.armyDetail(a.id)};cv.appendChild(el)});
+  S.bs.forEach(b=>{const el=document.createElement('div');el.className='bm';el.style.cssText=`left:${b.x}px;top:${b.y}px`;el.innerHTML='<div class="bi_">💀</div>';el.onclick=e=>{e.stopPropagation();UI.banditInfo(b)};cv.appendChild(el)});
+}};
+
+// ==== GAME ENGINE ====
+const G={
+iv:null,MS:[0,800,300,80],
+spd(s){S.sp=s;for(let i=0;i<4;i++)$('s'+i).classList.toggle('on',i===s);this.restart()},
+restart(){if(this.iv)clearInterval(this.iv);if(S.sp>0)this.iv=setInterval(()=>this.tick(),this.MS[S.sp])},
+tick(){
+  if(!S.on)return;const t=S.t;t.d++;
+  if(t.d>30){t.d=1;t.m++;this.month()}
+  if(t.m>12){t.m=1;t.y++;this.year()}
+  $('gTm').textContent=`第${F(t.y)}年${t.m}月${t.d}日`;
+  this.moveArm();if(t.d%3===0)this.combat();
+  if(Math.random()<.015)this.moveBan();
+  if(t.d%5===0)AI.run();
+  M.render();this.hud()
+},
+month(){
+  const tm=this.lf('tax','tm')??1;
+  S.fs.forEach(f=>{
+    let inc=0,tp=0;
+    S.cs.filter(c=>c.fid===f.id).forEach(c=>{
+      inc+=c.pop*.01*(1+c.eco*.1)*tm;tp+=c.pop;
+      c.pop=Math.max(10,Math.floor(c.pop*(1+.001+(this.tf('pg')||0)+(this.lf('tax','pg')||0))))
+    });
+    let up=0;S.as.filter(a=>a.fid===f.id).forEach(a=>{up+=a.up||a.n*.5});
+    if(f.id===S.pf){S.inc=Math.round(inc);S.upk=Math.round(up)}
+    f.gold=Math.max(-9999,(f.gold||0)+inc-up);f.tpop=tp;
+    if(f.gold<-500){S.as.filter(a=>a.fid===f.id).forEach(a=>{a.n=Math.floor(a.n*.9)});if(f.id===S.pf)UI.notify('国库空虚，军队逃散！','war')}
+  });
+  S.as=S.as.filter(a=>a.n>0);
+  if(S.cr){const sp=1+(this.tf('rs')||0);S.rp+=sp*2;const t=this.ft(S.cr);if(t&&S.rp>=t.cost){S.res[t.id]=true;UI.notify(`「${t.name}」研究完成！`,'ok');S.cr=null;S.rp=0}}
+},
+year(){if(Math.random()<.1&&M.iw>0){S.bs.push({id:U(),name:P(['黑山贼','流寇','海盗','叛军','山匪']),x:R(50,M.iw-50),y:R(50,M.ih-50),n:R(50,500),atk:R(3,10),def:R(2,8)});UI.notify('匪寇出没！','war')}},
+moveArm(){S.as.forEach(a=>{if(a.tx==null)return;const dx=a.tx-a.x,dy=a.ty-a.y,d=Math.hypot(dx,dy),sp=(a.tp==='air'?8:a.tp==='naval'?4:3)*(1+(this.tf('as')||0));if(d<sp){a.x=a.tx;a.y=a.ty;a.tx=null;a.ty=null;if(a.tc){const tc=S.cs.find(c=>c.id===a.tc);if(tc&&tc.fid!==a.fid)this.siege(a,tc);a.tc=null}}else{a.x+=dx/d*sp;a.y+=dy/d*sp}})},
+moveBan(){S.bs.forEach(b=>{b.x=CL(b.x+R(-25,25),10,(M.iw||999)-10);b.y=CL(b.y+R(-25,25),10,(M.ih||499)-10)})},
+combat(){
+  const now=Date.now();
+  for(let i=0;i<S.as.length;i++)for(let j=i+1;j<S.as.length;j++){
+    const a=S.as[i],b=S.as[j];if(a.fid===b.fid)continue;if(Math.hypot(a.x-b.x,a.y-b.y)>25)continue;
+    if(!this.atWar(a.fid,b.fid))continue;
+    const ck=a.id<b.id?a.id+'_'+b.id:b.id+'_'+a.id;
+    if(S.bcd[ck]&&now-S.bcd[ck]<3000)continue;S.bcd[ck]=now;
+    const ap=a.n*((a.atk||5)+(this.tf('aa')||0)),bp=b.n*((b.atk||5)+(this.tf('aa')||0)),t=ap+bp;
+    a.n=Math.max(0,a.n-Math.floor(a.n*(bp/t)*(.08+Math.random()*.08)));
+    b.n=Math.max(0,b.n-Math.floor(b.n*(ap/t)*(.08+Math.random()*.08)));
+    if(a.fid===S.pf||b.fid===S.pf){const fa=S.fs.find(f=>f.id===a.fid),fb=S.fs.find(f=>f.id===b.fid);UI.notify(`${fa?.name||'?'} vs ${fb?.name||'?'}`,'war')}
+  }
+  S.as.forEach(a=>{S.bs.forEach(b=>{if(Math.hypot(a.x-b.x,a.y-b.y)>25)return;const ck='b'+a.id+b.id;if(S.bcd[ck]&&now-S.bcd[ck]<3000)return;S.bcd[ck]=now;const ap=a.n*((a.atk||5)+(this.tf('aa')||0)),bp=b.n*(b.atk||3),t=ap+bp;a.n=Math.max(0,a.n-Math.floor(a.n*(bp/t)*.06));b.n=Math.max(0,b.n-Math.floor(b.n*(ap/t)*.12));if(b.n<=0&&a.fid===S.pf)UI.notify(`「${b.name}」被消灭！`,'ok')})});
+  S.as=S.as.filter(a=>a.n>0);S.bs=S.bs.filter(b=>b.n>0)
+},
+siege(a,c){const db=(this.tf('cd')||0)+(c.def||10),sb=this.tf('sg')||0,ap=a.n*((a.atk||5)+sb),cp=(c.gar||0)*5+db*10;if(ap>cp){const nf=S.fs.find(f=>f.id===a.fid);c.fid=a.fid;c.gar=Math.floor(a.n*.2);a.n=Math.floor(a.n*.8);UI.notify(`${nf?.name||'?'}攻占${c.name}！`,'war')}else{a.n=Math.floor(a.n*.7);if(a.fid===S.pf)UI.notify(`攻城失败:${c.name}`,'war')}},
+atWar(a,b){return S.wars.some(w=>(w.a===a&&w.d===b)||(w.a===b&&w.d===a))},
+decl(a,b){if(this.atWar(a,b))return;S.wars.push({a,d:b});const fa=S.fs.find(f=>f.id===a),fb=S.fs.find(f=>f.id===b);UI.notify(`${fa?.name}对${fb?.name}宣战！`,'war')},
+peace(a,b){S.wars=S.wars.filter(w=>!((w.a===a&&w.d===b)||(w.a===b&&w.d===a)));UI.notify(`和平达成`,'ok')},
+tf(k){let t=0;for(const e of(S.tt||D_TECH))for(const tc of e.techs)if(S.res[tc.id]&&tc.fx?.[k])t+=tc.fx[k];return t},
+lf(cat,k){const l=S.laws?.[cat];if(!l)return 0;const fx=LFX[cat];return fx?.[l.v]?.[k]||0},
+ft(id){for(const e of(S.tt||D_TECH))for(const t of e.techs)if(t.id===id)return t;return null},
+canRes(t){return!S.res[t.id]&&(!t.req||t.req.every(r=>S.res[r]))},
+startRes(id){const t=this.ft(id);if(!t||S.res[id])return;if(!this.canRes(t)){const miss=(t.req||[]).filter(r=>!S.res[r]).map(r=>{const m=this.ft(r);return m?m.name:r});UI.notify(`需先研究:${miss.join('、')}`,'war');return}S.cr=id;S.rp=0;UI.notify(`研究「${t.name}」`)},
+recruit(cid,uid,n){const c=S.cs.find(x=>x.id===cid),u=(S.un||D_UNIT).find(x=>x.id===uid),f=S.fs.find(x=>x.id===c?.fid);if(!c||!u||!f)return;const cm=this.lf('mil','rc')||1,tc=u.cost*n*cm;if(f.gold<tc){UI.notify(`需${F(tc)}金(有${F(f.gold)})`,'war');return}f.gold-=tc;const ex=S.as.find(a=>a.fid===f.id&&Math.hypot(a.x-c.x,a.y-c.y)<15);if(ex){ex.n+=n;ex.up=(ex.up||0)+u.up*n}else S.as.push({id:U(),name:u.name+'部队',fid:f.id,tp:u.tp,x:c.x+R(-3,3),y:c.y+R(-3,3),n,atk:u.atk,def:u.def,up:u.up*n});UI.notify(`招募${n}${u.name}(-${F(tc)})`,'ok');M.render()},
+hud(){const f=S.fs.find(x=>x.id===S.pf);if(!f)return;$('gF').textContent=f.name;$('gG').textContent=F(f.gold||0);const net=S.inc-S.upk;$('gI').textContent=(net>=0?'+':'')+F(net)+'/月';$('gI').className='v'+(net<0?' neg':'');$('gP').textContent=F(f.tpop||0);$('gA').textContent=F(S.as.filter(a=>a.fid===f.id).reduce((s,a)=>s+a.n,0));$('gT').textContent=Object.keys(S.res).length},
+save(){const nm=prompt('存档名:','存档_第'+S.t.y+'年');if(!nm)return;const d=J(S);d._n=nm;d._d=new Date().toLocaleString();d.map='';LS.set('sv_'+U(),d);UI.notify('已保存！','ok')},
+load(k){const d=LS.get(k);if(!d){UI.notify('读取失败','war');return}Object.assign(S,d);S.on=true;S.bcd={};S.map=S.map||DM;$('menu').style.display='none';$('game').classList.add('on');M.load(S.map||DM);this.spd(S.sp||1);setTimeout(()=>{M.render();this.hud()},400)},
+init(sc){
+  S.on=true;S.t={y:sc.sy||1,m:1,d:1};S.fs=J(sc.fs||[]);S.cs=J(sc.cs||[]);S.as=J(sc.as||[]);S.bs=J(sc.bs||[]);S.tt=J(sc.tt||D_TECH);S.cul=J(sc.cul||D_CUL);S.un=J(sc.un||D_UNIT);S.ch=J(sc.ch||D_CHAR);S.laws=J(sc.laws||D_LAW);S.res={};S.cr=null;S.rp=0;S.wars=[];S.bcd={};S.inc=0;S.upk=0;
+  S.pf=sc.pf||(sc.fs[0]?.id);S.map=sc.map||DM;
+  S.fs.forEach(f=>{f.gold=f.gold||1000;f.tpop=0});
+  $('menu').style.display='none';$('game').classList.add('on');M.load(S.map);this.spd(1);setTimeout(()=>{M.render();this.hud()},400)
+}
+};
+
+// ==== AI ====
+const AI={
+run(){S.fs.forEach(f=>{if(f.id===S.pf)return;this.do(f)})},
+do(f){
+  const fc=S.cs.filter(c=>c.fid===f.id),fa=S.as.filter(a=>a.fid===f.id),tt=fa.reduce((s,a)=>s+a.n,0);
+  if(f.gold>500&&tt<Math.max(200,(f.tpop||0)*.08)&&fc.length>0){const c=P(fc),u=P((S.un||D_UNIT).filter(x=>x.tp==='land'));if(u){const n=CL(Math.floor(f.gold/u.cost/3),5,80);if(n>5){f.gold-=u.cost*n;S.as.push({id:U(),name:u.name+'部队',fid:f.id,tp:'land',x:c.x+R(-4,4),y:c.y+R(-4,4),n,atk:u.atk,def:u.def,up:u.up*n})}}}
+  if(fa.length>0&&Math.random()<.015){const tg=P(S.fs.filter(x=>x.id!==f.id));if(tg&&!G.atWar(f.id,tg.id)){const tp=S.as.filter(a=>a.fid===tg.id).reduce((s,a)=>s+a.n,0);if(tt>tp*1.6)G.decl(f.id,tg.id)}}
+  S.wars.forEach(w=>{let eid=w.a===f.id?w.d:w.d===f.id?w.a:null;if(!eid)return;const ec=S.cs.filter(c=>c.fid===eid);if(!ec.length)return;fa.forEach(a=>{if(a.tx==null){const t=P(ec);a.tx=t.x;a.ty=t.y;a.tc=t.id}})});
+  S.wars.forEach(w=>{let eid=w.a===f.id?w.d:w.d===f.id?w.a:null;if(eid&&fc.length<=1&&Math.random()<.08)G.peace(f.id,eid)});
+  fa.forEach(a=>{if(a.tx!=null)return;const nb=S.bs.find(b=>Math.hypot(b.x-a.x,b.y-a.y)<80);if(nb&&a.n>nb.n*1.5){a.tx=nb.x;a.ty=nb.y}})
+}};
+
+// ==== UI ====
+const UI={
+_cp:null,_ph:[],
+modal(t,b,f,w){$('mot').textContent=t;$('mob').innerHTML=b;$('mof').innerHTML=f||'';$('moc').classList.toggle('w',!!w);$('ov').classList.add('on')},
+closeModal(){$('ov').classList.remove('on')},
+notify(m,t=''){const el=document.createElement('div');el.className='nfi '+(t==='war'?'war':t==='ok'?'ok':'');el.textContent=m;$('nf').appendChild(el);setTimeout(()=>el.remove(),5000)},
+panel(n){if(this._cp===n){this.closePanel();return}this._cp=n;this._ph=[];$('pnBk').style.display='none';$('pn').classList.add('op');({city:()=>this.cityList(),army:()=>this.armyList(),tech:()=>this.techPn(),diplo:()=>this.diploPn(),law:()=>this.lawPn(),fac:()=>this.facPn()})[n]?.()},
+closePanel(){this._cp=null;this._ph=[];$('pn').classList.remove('op')},
+panelBack(){if(this._ph.length){this._ph.pop()();$('pnBk').style.display=this._ph.length?'inline':'none'}},
+pushPn(fn){this._ph.push(fn);$('pnBk').style.display='inline'},
+fl(inp,cid){const v=inp.value.toLowerCase();document.querySelectorAll('#'+cid+' .li').forEach(e=>{e.style.display=(e.dataset.s||e.textContent).toLowerCase().includes(v)?'':'none'})},
+
+// -- City --
+cityList(){$('pnt').textContent='城池';const mc=S.cs.filter(c=>c.fid===S.pf);$('pnb').innerHTML=mc.length?mc.map(c=>`<div class="li" onclick="UI.cityDetail('${c.id}')"><div class="li-i"><div class="li-n">${E(c.name)}</div><div class="li-d">人口${F(c.pop)} 经济Lv${c.eco} 防御${c.def}</div></div><div class="li-a"><button class="b bxs bs" onclick="event.stopPropagation();UI.editCity('${c.id}')">✏</button></div></div>`).join(''):'<div class="empty">暂无城池 — 右键地图放置</div>'},
+cityDetail(cid){const c=S.cs.find(x=>x.id===cid);if(!c)return;$('pnt').textContent=c.name;$('pn').classList.add('op');this.pushPn(()=>this.cityList());const f=S.fs.find(x=>x.id===c.fid),cu=(S.cul||D_CUL).find(x=>x.id===c.cul),mine=c.fid===S.pf,pf=S.fs.find(x=>x.id===S.pf);
+let h=`<div class="ps"><div class="pst">信息</div>${[['所属',f?.name||'无'],['民族',cu?.name||'无'],['人口',F(c.pop)],['经济','Lv'+c.eco],['防御',c.def],['驻军',F(c.gar||0)],['类型',c.type||'普通']].map(([l,v])=>`<div class="sr"><span class="l">${l}</span><span class="v">${v}</span></div>`).join('')}</div>`;
+if(mine){h+=`<div class="ps"><div class="pst">招募 (金币:${F(pf?.gold||0)})</div>`;
+const units=(S.un||D_UNIT).filter(u=>{if(u.tp==='air'&&!G.tf('air'))return false;if(u.tp==='naval'&&!G.tf('nav'))return false;return u.cul==='通用'||u.cul===cu?.name});
+units.forEach(u=>{const cm=G.lf('mil','rc')||1;h+=`<div class="li" style="cursor:default"><div class="li-i"><div class="li-n">${E(u.name)} <span class="tg">${{land:'陆',naval:'海',air:'空'}[u.tp]}</span></div><div class="li-d">攻${u.atk}防${u.def} ${F(u.cost*cm)}/人</div></div><div class="li-a"><button class="b bxs bp" onclick="G.recruit('${cid}','${u.id}',10);UI.cityDetail('${cid}')">+10</button><button class="b bxs bp" onclick="G.recruit('${cid}','${u.id}',50);UI.cityDetail('${cid}')">+50</button></div></div>`});h+='</div>'}
+$('pnb').innerHTML=h},
+editCity(cid){const c=S.cs.find(x=>x.id===cid);if(!c)return;this.modal('编辑城池',`<div class="fr"><label class="fl">名称</label><input class="fi" id="ec_n" value="${E(c.name)}"></div><div class="frr"><div class="fr"><label class="fl">人口</label><input type="number" class="fi" id="ec_p" value="${c.pop}"></div><div class="fr"><label class="fl">经济</label><input type="number" class="fi" id="ec_e" value="${c.eco}"></div></div><div class="frr"><div class="fr"><label class="fl">防御</label><input type="number" class="fi" id="ec_d" value="${c.def}"></div><div class="fr"><label class="fl">驻军</label><input type="number" class="fi" id="ec_g" value="${c.gar||0}"></div></div><div class="fr"><label class="fl">类型</label><input class="fi" id="ec_t" value="${E(c.type||'')}"></div><div class="fr"><label class="fl">文化</label><select class="fsel" id="ec_cu"><option value="">无</option>${(S.cul||D_CUL).map(x=>`<option value="${x.id}"${x.id===c.cul?' selected':''}>${E(x.name)}</option>`).join('')}</select></div>`,`<button class="b bd" onclick="S.cs=S.cs.filter(x=>x.id!=='${cid}');UI.closeModal();M.render();UI.cityList()">删除</button><button class="b bs" onclick="UI.closeModal()">取消</button><button class="b bp" onclick="UI._svCity('${cid}')">保存</button>`)},
+_svCity(cid){const c=S.cs.find(x=>x.id===cid);if(!c)return;c.name=$('ec_n').value||c.name;c.pop=Math.max(0,+$('ec_p').value)||c.pop;c.eco=CL(+$('ec_e').value||1,1,100);c.def=Math.max(0,+$('ec_d').value||0);c.gar=Math.max(0,+$('ec_g').value||0);c.type=$('ec_t').value;c.cul=$('ec_cu').value;this.closeModal();M.render()},
+
+// -- Army --
+armyList(){$('pnt').textContent='军事';const ma=S.as.filter(a=>a.fid===S.pf);$('pnb').innerHTML=ma.length?ma.map(a=>`<div class="li" onclick="UI.armyDetail('${a.id}')"><div class="li-i"><div class="li-n">${E(a.name)} <span class="tg">${{land:'陆',naval:'海',air:'空'}[a.tp]}</span></div><div class="li-d">兵力${F(a.n)} 攻${a.atk}防${a.def}</div></div><div class="li-a"><button class="b bxs bs" onclick="event.stopPropagation();UI.moveArmy('${a.id}')">📍</button></div></div>`).join(''):'<div class="empty">暂无军队</div>'},
+armyDetail(aid){const a=S.as.find(x=>x.id===aid);if(!a)return;$('pnt').textContent=a.name;$('pn').classList.add('op');this.pushPn(()=>this.armyList());const f=S.fs.find(x=>x.id===a.fid),mine=a.fid===S.pf;
+let h=`<div class="ps"><div class="pst">部队</div>${[['所属',f?.name||'无'],['类型',{land:'陆军',naval:'海军',air:'空军'}[a.tp]],['兵力',F(a.n)],['攻击',a.atk],['防御',a.def],['维护',F(a.up||0)+'/月']].map(([l,v])=>`<div class="sr"><span class="l">${l}</span><span class="v">${v}</span></div>`).join('')}</div>`;
+if(mine)h+=`<div class="ps"><button class="b bs" onclick="UI.moveArmy('${a.id}')" style="width:100%;margin-bottom:.3rem">📍移动</button><button class="b bs" onclick="UI.atkMenu('${a.id}')" style="width:100%;margin-bottom:.3rem">⚔攻城</button><button class="b bd" onclick="if(confirm('解散？')){S.as=S.as.filter(x=>x.id!=='${a.id}');M.render();UI.closePanel()}" style="width:100%">解散</button></div>`;
+$('pnb').innerHTML=h},
+moveArmy(aid){UI.notify('右键地图选目标');window._pam=aid},
+atkMenu(aid){const a=S.as.find(x=>x.id===aid);if(!a)return;const ec=S.cs.filter(c=>c.fid!==a.fid);this.modal('攻击目标',`<div class="sb"><input class="fi" placeholder="搜索..." oninput="UI.fl(this,'acl')"></div><div id="acl">${ec.map(c=>`<div class="li" data-s="${E(c.name)}" onclick="UI._doAtk('${aid}','${c.id}')"><div class="li-i"><div class="li-n">${E(c.name)}</div><div class="li-d">防${c.def} 驻军${c.gar||0}</div></div></div>`).join('')}</div>`,`<button class="b bs" onclick="UI.closeModal()">取消</button>`)},
+_doAtk(aid,cid){const a=S.as.find(x=>x.id===aid),c=S.cs.find(x=>x.id===cid);if(!a||!c)return;if(!G.atWar(a.fid,c.fid)){if(!confirm(`将对${S.fs.find(f=>f.id===c.fid)?.name||'?'}宣战，确定？`))return;G.decl(a.fid,c.fid)}a.tx=c.x;a.ty=c.y;a.tc=c.id;this.closeModal();UI.notify(`出发→${c.name}`)},
+
+// -- Tech --
+techPn(){$('pnt').textContent='科技';let h='';
+if(S.cr){const t=G.ft(S.cr);if(t){const p=CL((S.rp/t.cost)*100,0,100);h+=`<div class="ps"><div class="pst">研究中</div><div style="font-weight:700">${t.name}</div><div class="prog"><div class="pin" style="width:${p}%"></div></div><div style="font-size:.62rem;color:var(--t3)">${Math.floor(S.rp)}/${t.cost}(${Math.floor(p)}%)</div></div>`}}
+(S.tt||D_TECH).forEach(e=>{h+=`<div class="te"><div class="tel">${E(e.era)}</div><div class="tns">`;e.techs.forEach(t=>{const ok=S.res[t.id],wk=S.cr===t.id,can=G.canRes(t);h+=`<div class="tn_ ${ok?'ok':wk?'wk':can?'':'lk'}" onclick="${can&&!ok?`G.startRes('${t.id}');UI.techPn()`:!ok&&!can?`G.startRes('${t.id}')`:''}" title="${E(t.desc||'')}"><div class="tnn">${E(t.name)}</div><div class="tnc">${ok?'✓':t.cost}</div>${wk?`<div class="tp_" style="width:${CL((S.rp/t.cost)*100,0,100)}%"></div>`:''}</div>`});h+='</div></div>'});$('pnb').innerHTML=h},
+
+// -- Diplo --
+diploPn(){$('pnt').textContent='外交';$('pnb').innerHTML=S.fs.filter(f=>f.id!==S.pf).map(f=>{const w=G.atWar(S.pf,f.id);return`<div class="li"><div class="li-i"><div class="li-n"><span style="display:inline-block;width:10px;height:10px;background:${f.col};margin-right:4px;vertical-align:middle"></span>${E(f.name)}</div><div class="li-d">城池${S.cs.filter(c=>c.fid===f.id).length} 军力${F(S.as.filter(a=>a.fid===f.id).reduce((s,a)=>s+a.n,0))}</div></div><div class="li-a">${w?`<span class="tg tg-r">战争</span><button class="b bxs bs" onclick="G.peace('${S.pf}','${f.id}');UI.diploPn()">求和</button>`:`<span class="tg tg-gr">和平</span><button class="b bxs bd" onclick="if(confirm('宣战？')){G.decl('${S.pf}','${f.id}');UI.diploPn()}">宣战</button>`}</div></div>`}).join('')||'<div class="empty">无其他势力</div>'},
+
+// -- Law --
+lawPn(){$('pnt').textContent='法律';if(!S.laws)S.laws=J(D_LAW);$('pnb').innerHTML=Object.entries(S.laws).map(([k,l])=>`<div class="lc"><div class="lct">${l.n}</div><div class="lo">${l.o.map(o=>`<div class="loi${o===l.v?' on':''}" onclick="S.laws['${k}'].v='${o}';UI.lawPn()">${o}</div>`).join('')}</div></div>`).join('')},
+
+// -- Faction --
+facPn(){$('pnt').textContent='派系';const f=S.fs.find(x=>x.id===S.pf);if(!f){$('pnb').innerHTML='<div class="empty">无</div>';return}const net=S.inc-S.upk;
+$('pnb').innerHTML=`<div class="ps"><div class="pst">我的派系</div>${[['名称',f.name],['金币',F(f.gold||0)],['月入',F(S.inc)],['月出',F(S.upk)],['净收',`<span style="color:${net>=0?'var(--gr)':'var(--r)'};">${F(net)}</span>`],['人口',F(f.tpop||0)]].map(([l,v])=>`<div class="sr"><span class="l">${l}</span><span class="v">${v}</span></div>`).join('')}<div class="sr"><span class="l">旗帜</span><span class="v"><div class="fp_">${(f.fc||['#c9a84c','#b44040','#0a0e17']).map(c=>`<div style="background:${c}"></div>`).join('')}</div></span></div></div>
+<div class="ps"><div class="pst">人物</div>${(S.ch||D_CHAR).filter(ch=>ch.fid===f.id).map(ch=>`<div class="li" style="cursor:default"><div class="li-i"><div class="li-n">${E(ch.name)}${ch.role?' <span class="tg tg-g">'+E(ch.role)+'</span>':''}</div><div class="li-d">统${ch.sk?.c||0} 政${ch.sk?.a||0} 外${ch.sk?.d||0}</div></div></div>`).join('')||'<div class="empty">暂无</div>'}</div>`},
+
+// -- Context Menu --
+showCtx(sx,sy,mx,my){const m=$('ctx');let it='';
+if(window._pam){it+=`<div class="ci_" onclick="UI._mvA('${window._pam}',${mx},${my})">📍移动到此</div>`;window._pam=null}
+it+=`<div class="ci_" onclick="UI.addCity(${mx},${my})">🏰放置城池</div><div class="ci_" onclick="UI.addBandit(${mx},${my})">💀放置匪寇</div><div class="cxs"></div><div class="ci_" onclick="$('ctx').classList.remove('vis')">取消</div>`;
+m.innerHTML=it;m.style.left=Math.min(sx,innerWidth-150)+'px';m.style.top=Math.min(sy,innerHeight-140)+'px';m.classList.add('vis');setTimeout(()=>document.addEventListener('click',()=>$('ctx').classList.remove('vis'),{once:true}),10)},
+_mvA(aid,mx,my){const a=S.as.find(x=>x.id===aid);if(a){a.tx=mx;a.ty=my;a.tc=null}$('ctx').classList.remove('vis')},
+addCity(mx,my){$('ctx').classList.remove('vis');this.modal('放置城池',`<div class="fr"><label class="fl">名称</label><input class="fi" id="nc_n" value="新城池"></div><div class="frr"><div class="fr"><label class="fl">人口</label><input type="number" class="fi" id="nc_p" value="1000"></div><div class="fr"><label class="fl">经济</label><input type="number" class="fi" id="nc_e" value="1"></div></div><div class="frr"><div class="fr"><label class="fl">防御</label><input type="number" class="fi" id="nc_d" value="10"></div><div class="fr"><label class="fl">驻军</label><input type="number" class="fi" id="nc_g" value="50"></div></div><div class="fr"><label class="fl">所属</label><select class="fsel" id="nc_f">${S.fs.map(f=>`<option value="${f.id}">${E(f.name)}</option>`).join('')}</select></div><div class="fr"><label class="fl">文化</label><select class="fsel" id="nc_cu"><option value="">无</option>${(S.cul||D_CUL).map(c=>`<option value="${c.id}">${E(c.name)}</option>`).join('')}</select></div>`,`<button class="b bs" onclick="UI.closeModal()">取消</button><button class="b bp" onclick="UI._mkC(${mx},${my})">确定</button>`)},
+_mkC(mx,my){S.cs.push({id:U(),name:$('nc_n').value||'新城池',x:mx,y:my,pop:Math.max(0,+$('nc_p').value)||1000,eco:CL(+$('nc_e').value||1,1,100),def:Math.max(0,+$('nc_d').value||10),gar:Math.max(0,+$('nc_g').value||50),type:'',tags:[],fid:$('nc_f').value,cul:$('nc_cu').value});this.closeModal();M.render()},
+addBandit(mx,my){$('ctx').classList.remove('vis');const n=prompt('匪寇名称','流寇');if(!n)return;S.bs.push({id:U(),name:n,x:mx,y:my,n:R(20,200),atk:R(3,8),def:R(2,6)});M.render()},
+banditInfo(b){$('pnt').textContent='匪寇:'+b.name;$('pn').classList.add('op');this._cp='bd';$('pnb').innerHTML=`<div class="ps">${[['兵力',F(b.n)],['攻击',b.atk],['防御',b.def]].map(([l,v])=>`<div class="sr"><span class="l">${l}</span><span class="v">${v}</span></div>`).join('')}</div>`},
+
+// ===== MENU EDITORS (CRUD) =====
+// Generic CRUD helper
+_crud(title,lsKey,defaults,fields,listRender){
+  const data=LS.get(lsKey)||J(defaults);
+  const save=()=>LS.set(lsKey,data);
+  const refresh=()=>this._crud(title,lsKey,data,fields,listRender);
+  let h=`<div class="sb"><input class="fi" placeholder="搜索..." oninput="UI.fl(this,'crud_list')"><button class="b bp" id="crud_add">+ 新建</button></div><div id="crud_list">`;
+  data.forEach((item,i)=>{h+=`<div class="li" data-s="${E(listRender(item))}"><div class="li-i"><div class="li-n">${listRender(item)}</div></div><div class="li-a"><button class="b bxs bs" data-action="edit" data-idx="${i}">✏</button><button class="b bxs bd" data-action="del" data-idx="${i}">✕</button></div></div>`});
+  h+='</div>';
+  this.modal(title,h,`<button class="b bs" onclick="UI.closeModal()">关闭</button>`,true);
+  // Bind events
+  $('crud_add').onclick=()=>{const nw={id:U()};fields.forEach(f=>{nw[f.key]=f.def});data.push(nw);save();this.closeModal();refresh()};
+  document.querySelectorAll('[data-action="edit"]').forEach(btn=>{btn.onclick=e=>{e.stopPropagation();const idx=+btn.dataset.idx;this._crudEdit(data,idx,fields,save,refresh)}});
+  document.querySelectorAll('[data-action="del"]').forEach(btn=>{btn.onclick=e=>{e.stopPropagation();if(!confirm('删除？'))return;data.splice(+btn.dataset.idx,1);save();this.closeModal();refresh()}});
+},
+_crudEdit(data,idx,fields,save,refresh){
+  const item=data[idx];
+  let h='';fields.forEach(f=>{
+    if(f.type==='text')h+=`<div class="fr"><label class="fl">${f.label}</label><input class="fi" id="cf_${f.key}" value="${E(String(item[f.key]||''))}"></div>`;
+    else if(f.type==='number')h+=`<div class="fr"><label class="fl">${f.label}</label><input type="number" class="fi" id="cf_${f.key}" value="${item[f.key]||0}"></div>`;
+    else if(f.type==='textarea')h+=`<div class="fr"><label class="fl">${f.label}</label><textarea class="ft" id="cf_${f.key}">${E(String(item[f.key]||''))}</textarea></div>`;
+    else if(f.type==='select')h+=`<div class="fr"><label class="fl">${f.label}</label><select class="fsel" id="cf_${f.key}">${f.options.map(o=>`<option value="${o}"${o===(item[f.key]||'')?' selected':''}>${o}</option>`).join('')}</select></div>`;
+  });
+  this.modal('编辑',h,`<button class="b bs" onclick="UI.closeModal()">取消</button><button class="b bp" id="crud_save">保存</button>`);
+  $('crud_save').onclick=()=>{fields.forEach(f=>{const el=$('cf_'+f.key);if(!el)return;if(f.type==='number')item[f.key]=+el.value;else item[f.key]=el.value});save();this.closeModal();refresh()};
+},
+
+// Scenario Editor
+async scenarioEditor(){
+  const scs=LS.get('scenarios')||[];
+  let h=`<div class="sb"><input class="fi" placeholder="搜索..." oninput="UI.fl(this,'scl')"><button class="b bp" onclick="UI.newScen()">新建剧本</button></div><div id="scl">`;
+  h+=`<div class="li" data-s="默认"><div class="li-i"><div class="li-n">默认剧本</div><div class="li-d">3派系6城池</div></div><div class="li-a"><button class="b bsm bp" onclick="UI.defScen()">开始</button></div></div>`;
+  scs.forEach((s,i)=>{h+=`<div class="li" data-s="${E(s.name||'')}"><div class="li-i"><div class="li-n">${E(s.name)}</div><div class="li-d">${s.fs?.length||0}派系${s.cs?.length||0}城池</div></div><div class="li-a"><button class="b bxs bp" onclick="UI.useScen(${i})">开始</button><button class="b bxs bs" onclick="UI.editScen(${i})">✏</button><button class="b bxs bd" onclick="UI.delScen(${i})">✕</button></div></div>`});
+  h+='</div>';this.modal('剧本管理',h,'',true)
+},
+defScen(){this.closeModal();this.scenSetup({name:'默认',sy:1,map:DM,fs:[{id:'f1',name:'华夏',col:'#c9a84c',fc:['#c9a84c','#b44040','#0a0e17'],gold:2000,cap:'c1'},{id:'f2',name:'草原汗国',col:'#4a8c5c',fc:['#4a8c5c','#2d5a3a','#1a3520'],gold:1500,cap:'c3'},{id:'f3',name:'罗马帝国',col:'#7c5cbf',fc:['#7c5cbf','#c9a84c','#3b2070'],gold:1800,cap:'c5'}],cs:[{id:'c1',name:'长安',x:920,y:230,pop:50000,eco:5,def:30,gar:500,fid:'f1',cul:'c_han',type:'都城'},{id:'c2',name:'洛阳',x:950,y:250,pop:30000,eco:4,def:20,gar:300,fid:'f1',cul:'c_han'},{id:'c3',name:'斡难河',x:960,y:160,pop:15000,eco:2,def:10,gar:800,fid:'f2',cul:'c_nomad',type:'王庭'},{id:'c4',name:'和林',x:940,y:180,pop:10000,eco:2,def:8,gar:400,fid:'f2',cul:'c_nomad'},{id:'c5',name:'罗马',x:510,y:210,pop:40000,eco:5,def:35,gar:600,fid:'f3',cul:'c_roman',type:'都城'},{id:'c6',name:'君堡',x:570,y:210,pop:25000,eco:4,def:40,gar:400,fid:'f3',cul:'c_roman'}],as:[],bs:[{id:'b1',name:'黄巾余党',x:980,y:260,n:200,atk:4,def:3},{id:'b2',name:'北海盗匪',x:500,y:140,n:150,atk:5,def:2}],ch:[{id:'ch1',name:'始皇大帝',cul:'汉族',fid:'f1',role:'君主',sk:{c:90,a:85,d:60}},{id:'ch2',name:'铁木真',cul:'游牧',fid:'f2',role:'大汗',sk:{c:95,a:70,d:50}},{id:'ch3',name:'凯撒',cul:'罗马',fid:'f3',role:'执政官',sk:{c:88,a:80,d:75}}]})},
+scenSetup(sc){this._ps=sc;this.modal(sc.name||'选择派系',`<div class="fr"><label class="fl">选择派系</label><select class="fsel" id="sf">${sc.fs.map(f=>`<option value="${f.id}">${E(f.name)}</option>`).join('')}</select></div><div class="fr"><label class="fl">模式</label><select class="fsel" id="sm"><option value="nation">国家模式</option><option value="character">人物模式</option></select></div>`,`<button class="b bs" onclick="UI.closeModal()">返回</button><button class="b bp" onclick="UI.launch()">开始⚔</button>`)},
+launch(){const sc=this._ps;sc.pf=$('sf').value;this.closeModal();G.init(sc)},
+newScen(){this.closeModal();const sc={name:'新剧本',sy:1,map:DM,fs:[],cs:[],as:[],bs:[],ch:[]};this._es=sc;this._esi=-1;this.editScenUI()},
+editScen(i){this.closeModal();const scs=LS.get('scenarios')||[];this._es=J(scs[i]);this._esi=i;this.editScenUI()},
+editScenUI(){const s=this._es;this.modal('编辑:'+s.name,`<div class="tabs" id="stb"><button class="tab on" onclick="UI.stab('b',this)">基本</button><button class="tab" onclick="UI.stab('f',this)">派系</button><button class="tab" onclick="UI.stab('c',this)">城池</button><button class="tab" onclick="UI.stab('bn',this)">匪寇</button><button class="tab" onclick="UI.stab('ch',this)">人物</button></div><div id="stc"></div>`,`<button class="b bs" onclick="UI.closeModal();UI.scenarioEditor()">返回</button><button class="b bp" onclick="UI.svScen()">保存</button>`,true);this.stab('b',document.querySelector('#stb .tab'))},
+stab(t,btn){document.querySelectorAll('#stb .tab').forEach(x=>x.classList.remove('on'));btn?.classList.add('on');const s=this._es,c=$('stc');
+if(t==='b')c.innerHTML=`<div class="fr"><label class="fl">名称</label><input class="fi" id="se_n" value="${E(s.name)}"></div><div class="fr"><label class="fl">起始年</label><input type="number" class="fi fi-s" id="se_y" value="${s.sy||1}"></div><div class="fr"><label class="fl">地图(可上传)</label><div style="margin:.3rem 0"><img src="${s.map||DM}" style="max-width:100%;max-height:150px;border:1px solid var(--bd)"></div><input type="file" accept="image/*" onchange="UI.mapUpload(event)"></div>`;
+else if(t==='f'){c.innerHTML=`<button class="b bsm bp" onclick="UI._es.fs.push({id:U(),name:'新派系',col:'#'+Math.floor(Math.random()*16777215).toString(16),fc:['#888','#444','#222'],gold:1000});UI.stab('f')">+派系</button><div style="margin-top:.4rem">${s.fs.map((f,i)=>`<div class="li"><div class="li-i"><div class="li-n"><span style="display:inline-block;width:10px;height:10px;background:${f.col};margin-right:4px"></span>${E(f.name)}</div><div class="li-d">金币${f.gold||0}</div></div><div class="li-a"><button class="b bxs bs" onclick="UI.editSF(${i})">✏</button><button class="b bxs bd" onclick="UI._es.fs.splice(${i},1);UI.stab('f')">✕</button></div></div>`).join('')}</div>`}
+else if(t==='c'){c.innerHTML=`<button class="b bsm bp" onclick="UI._es.cs.push({id:U(),name:'新城池',x:R(100,900),y:R(100,400),pop:1000,eco:1,def:10,gar:50,fid:UI._es.fs[0]?.id||''});UI.stab('c')">+城池</button><div style="margin-top:.4rem">${s.cs.map((ct,i)=>`<div class="li"><div class="li-i"><div class="li-n">${E(ct.name)}</div><div class="li-d">人口${F(ct.pop)}(${Math.round(ct.x)},${Math.round(ct.y)})</div></div><div class="li-a"><button class="b bxs bs" onclick="UI.editSC(${i})">✏</button><button class="b bxs bd" onclick="UI._es.cs.splice(${i},1);UI.stab('c')">✕</button></div></div>`).join('')}</div>`}
+else if(t==='bn'){c.innerHTML=`<button class="b bsm bp" onclick="UI._es.bs.push({id:U(),name:P(['流寇','山贼','海盗']),x:R(100,900),y:R(100,400),n:R(50,300),atk:R(3,8),def:R(2,6)});UI.stab('bn')">+匪寇</button><div style="margin-top:.4rem">${s.bs.map((b,i)=>`<div class="li"><div class="li-i"><div class="li-n">${E(b.name)}</div><div class="li-d">兵力${b.n}</div></div><div class="li-a"><button class="b bxs bd" onclick="UI._es.bs.splice(${i},1);UI.stab('bn')">✕</button></div></div>`).join('')}</div>`}
+else if(t==='ch'){c.innerHTML=`<button class="b bsm bp" onclick="UI._es.ch.push({id:U(),name:'新人物',fid:'',sk:{c:50,a:50,d:50}});UI.stab('ch')">+人物</button><div style="margin-top:.4rem">${(s.ch||[]).map((ch,i)=>`<div class="li"><div class="li-i"><div class="li-n">${E(ch.name)}</div><div class="li-d">统${ch.sk?.c||0}政${ch.sk?.a||0}外${ch.sk?.d||0}</div></div><div class="li-a"><button class="b bxs bs" onclick="UI.editSCh(${i})">✏</button><button class="b bxs bd" onclick="UI._es.ch.splice(${i},1);UI.stab('ch')">✕</button></div></div>`).join('')}</div>`}
+},
+mapUpload(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{this._es.map=e.target.result;this.stab('b')};r.readAsDataURL(f)},
+editSF(i){const f=this._es.fs[i];$('stc').innerHTML=`<div class="fr"><label class="fl">名称</label><input class="fi" id="sf_n" value="${E(f.name)}"></div><div class="fr"><label class="fl">颜色</label><input type="color" id="sf_c" value="${f.col}"></div><div class="fr"><label class="fl">金币</label><input type="number" class="fi fi-s" id="sf_g" value="${f.gold||1000}"></div><div class="fr"><label class="fl">旗帜色(逗号HEX)</label><input class="fi" id="sf_f" value="${(f.fc||[]).join(',')}"></div><div style="margin-top:.5rem"><button class="b bs" onclick="UI.stab('f')">取消</button> <button class="b bp" onclick="const f=UI._es.fs[${i}];f.name=$('sf_n').value;f.col=$('sf_c').value;f.gold=+$('sf_g').value||1000;f.fc=$('sf_f').value.split(',').map(s=>s.trim()).filter(Boolean);UI.stab('f')">保存</button></div>`},
+editSC(i){const ct=this._es.cs[i],s=this._es;$('stc').innerHTML=`<div class="fr"><label class="fl">名称</label><input class="fi" id="sc_n" value="${E(ct.name)}"></div><div class="frr"><div class="fr"><label class="fl">X</label><input type="number" class="fi" id="sc_x" value="${Math.round(ct.x)}"></div><div class="fr"><label class="fl">Y</label><input type="number" class="fi" id="sc_y" value="${Math.round(ct.y)}"></div></div><div class="frr"><div class="fr"><label class="fl">人口</label><input type="number" class="fi" id="sc_p" value="${ct.pop}"></div><div class="fr"><label class="fl">经济</label><input type="number" class="fi" id="sc_e" value="${ct.eco}"></div></div><div class="frr"><div class="fr"><label class="fl">防御</label><input type="number" class="fi" id="sc_d" value="${ct.def}"></div><div class="fr"><label class="fl">驻军</label><input type="number" class="fi" id="sc_g" value="${ct.gar||0}"></div></div><div class="fr"><label class="fl">派系</label><select class="fsel" id="sc_f"><option value="">无</option>${s.fs.map(f=>`<option value="${f.id}"${f.id===ct.fid?' selected':''}>${E(f.name)}</option>`).join('')}</select></div><div style="margin-top:.5rem"><button class="b bs" onclick="UI.stab('c')">取消</button> <button class="b bp" onclick="const c=UI._es.cs[${i}];c.name=$('sc_n').value;c.x=+$('sc_x').value;c.y=+$('sc_y').value;c.pop=+$('sc_p').value;c.eco=+$('sc_e').value;c.def=+$('sc_d').value;c.gar=+$('sc_g').value;c.fid=$('sc_f').value;UI.stab('c')">保存</button></div>`},
+editSCh(i){const ch=this._es.ch[i],s=this._es;$('stc').innerHTML=`<div class="fr"><label class="fl">名称</label><input class="fi" id="sch_n" value="${E(ch.name)}"></div><div class="fr"><label class="fl">派系</label><select class="fsel" id="sch_f"><option value="">无</option>${s.fs.map(f=>`<option value="${f.id}"${f.id===ch.fid?' selected':''}>${E(f.name)}</option>`).join('')}</select></div><div class="fr"><label class="fl">职位</label><input class="fi" id="sch_r" value="${E(ch.role||'')}"></div><div class="frr"><div class="fr"><label class="fl">统率</label><input type="number" class="fi" id="sch_c" value="${ch.sk?.c||50}"></div><div class="fr"><label class="fl">政治</label><input type="number" class="fi" id="sch_a" value="${ch.sk?.a||50}"></div><div class="fr"><label class="fl">外交</label><input type="number" class="fi" id="sch_d" value="${ch.sk?.d||50}"></div></div><div style="margin-top:.5rem"><button class="b bs" onclick="UI.stab('ch')">取消</button> <button class="b bp" onclick="const c=UI._es.ch[${i}];c.name=$('sch_n').value;c.fid=$('sch_f').value;c.role=$('sch_r').value;c.sk={c:CL(+$('sch_c').value,0,100),a:CL(+$('sch_a').value,0,100),d:CL(+$('sch_d').value,0,100)};UI.stab('ch')">保存</button></div>`},
+svScen(){const s=this._es;s.name=$('se_n')?.value||s.name;s.sy=+$('se_y')?.value||s.sy;const scs=LS.get('scenarios')||[];if(this._esi>=0)scs[this._esi]=s;else scs.push(s);LS.set('scenarios',scs);this.closeModal();this.scenarioEditor()},
+useScen(i){const scs=LS.get('scenarios')||[];this.closeModal();this.scenSetup(J(scs[i]))},
+delScen(i){if(!confirm('删除？'))return;const scs=LS.get('scenarios')||[];scs.splice(i,1);LS.set('scenarios',scs);this.scenarioEditor()},
+
+startGame(){this.scenarioEditor()},
+saveManager(){const keys=LS.keys('sv_');let h=`<div class="sb"><input class="fi" placeholder="搜索..." oninput="UI.fl(this,'svl')"></div><div id="svl">`;if(!keys.length)h+='<div class="empty">暂无存档</div>';keys.forEach(k=>{const d=LS.get(k);if(!d)return;h+=`<div class="li" data-s="${E(d._n||k)}"><div class="li-i"><div class="li-n">${E(d._n||k)}</div><div class="li-d">${d._d||''}</div></div><div class="li-a"><button class="b bsm bp" onclick="UI.closeModal();G.load('${k}')">读取</button><button class="b bsm bd" onclick="LS.del('${k}');UI.closeModal();UI.saveManager()">删除</button></div></div>`});h+='</div>';this.modal('存档管理',h)},
+
+// CRUD Editors for custom data
+techEditor(){this._crud('科技树','custom_tech',D_TECH[0].techs.length?D_TECH:D_TECH,
+  [{key:'era',label:'时代',type:'text',def:'新时代'}],
+  item=>item.era+' ('+item.techs.length+'科技)')},
+cultureEditor(){this._crud('民族文化','custom_cul',D_CUL,
+  [{key:'name',label:'名称',type:'text',def:'新文化'},{key:'desc',label:'描述',type:'textarea',def:''}],
+  item=>item.name)},
+charEditor(){this._crud('重要人物','custom_char',D_CHAR,
+  [{key:'name',label:'名称',type:'text',def:'新人物'},{key:'cul',label:'文化',type:'text',def:''},{key:'desc',label:'描述',type:'textarea',def:''}],
+  item=>item.name)},
+unitEditor(){this._crud('兵种','custom_unit',D_UNIT,
+  [{key:'name',label:'名称',type:'text',def:'新兵种'},{key:'cul',label:'文化',type:'text',def:'通用'},{key:'tp',label:'类型',type:'select',def:'land',options:['land','naval','air']},{key:'atk',label:'攻击',type:'number',def:5},{key:'def',label:'防御',type:'number',def:5},{key:'cost',label:'费用',type:'number',def:20},{key:'up',label:'维护',type:'number',def:2}],
+  item=>`${item.name} [${item.cul||'通用'}]`)},
+
+toMenu(){if(S.on&&!confirm('返回？未保存进度将丢失'))return;S.on=false;if(G.iv)clearInterval(G.iv);$('game').classList.remove('on');$('menu').style.display='';this.closePanel()},
+};
+
+// ==== KEYBOARD ====
+document.addEventListener('keydown',e=>{
+  if(!S.on)return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+  if(e.key===' '||e.code==='Space'){e.preventDefault();G.spd(S.sp===0?1:0)}
+  if(e.key==='Escape'){if($('ov').classList.contains('on'))UI.closeModal();else if($('pn').classList.contains('op'))UI.closePanel();else UI.toMenu()}
+  if(e.key>='1'&&e.key<='4')G.spd(+e.key-1);
 });
+
+// ==== INIT ====
+M.init();
 </script>
-</body>
-</html>
+</body></html>
