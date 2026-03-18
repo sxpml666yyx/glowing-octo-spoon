@@ -1,0 +1,16 @@
+/* ===== lists.css — 列表/标签/选项卡 ===== */
+.tg{display:inline-block;padding:.12rem .45rem;font-size:.7rem;border-radius:3px;font-weight:600}
+.tg-gold{background:var(--goldBg);color:var(--gold);border:1px solid rgba(184,150,58,.3)}
+.tg-red{background:var(--redBg);color:var(--red);border:1px solid rgba(192,80,64,.3)}
+.tg-green{background:var(--greenBg);color:var(--green);border:1px solid rgba(80,128,80,.3)}
+.tg-blue{background:var(--blueBg);color:var(--blue);border:1px solid rgba(64,112,160,.3)}
+
+.sb{display:flex;gap:.5rem;margin-bottom:.8rem}.sb .fi{flex:1}
+.li{display:flex;align-items:center;justify-content:space-between;padding:.65rem .9rem;background:var(--card);border:1px solid var(--bd);margin-bottom:.4rem;transition:all .15s;cursor:pointer;border-radius:5px}
+.li:hover{border-color:var(--bd2);background:var(--card2);box-shadow:var(--shadow)}
+.li-i{flex:1;min-width:0}.li-n{font-size:.9rem;font-weight:700}
+.li-d{font-size:.75rem;color:var(--tx3);margin-top:2px}.li-a{display:flex;gap:.3rem;flex-shrink:0;margin-left:.5rem}
+.tabs{display:flex;border-bottom:2px solid var(--bd);margin-bottom:.8rem;gap:.3rem}
+.tab{padding:.55rem 1rem;font-size:.85rem;color:var(--tx3);cursor:pointer;border:none;border-bottom:3px solid transparent;background:none;font-family:'GS',serif;font-weight:600;transition:all .15s;margin-bottom:-2px}
+.tab:hover{color:var(--tx2)}.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.empty{text-align:center;padding:2rem;color:var(--tx3);font-size:.9rem}

@@ -1,0 +1,11 @@
+/* ===== modal.css — 弹窗/遮罩 ===== */
+.ov{position:fixed;inset:0;z-index:10000;background:rgba(80,60,40,.35);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.ov.on{opacity:1;pointer-events:auto}
+.mo{background:var(--card);border:1px solid var(--bd);border-radius:8px;width:clamp(400px,60vw,800px);max-height:82vh;display:flex;flex-direction:column;box-shadow:var(--shadow2)}
+.mo.w{width:clamp(500px,80vw,1100px)}
+.mo-h{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.2rem;border-bottom:1px solid var(--bd);border-radius:8px 8px 0 0;background:var(--bg2)}
+.mo-h h2{font-size:1.05rem;font-weight:700;color:var(--bd3)}
+.xb{background:none;border:none;color:var(--tx3);font-size:1.3rem;cursor:pointer;padding:.2rem .5rem;border-radius:4px;transition:all .15s}
+.xb:hover{color:var(--red);background:var(--redBg)}
+.mo-b{padding:1.2rem;overflow-y:auto;flex:1}
+.mo-f{padding:.75rem 1.2rem;border-top:1px solid var(--bd);display:flex;gap:.5rem;justify-content:flex-end;background:var(--bg2);border-radius:0 0 8px 8px}
